@@ -15,7 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\BoerisCreaciones.Core\BoerisCreaciones.Core.csproj" />
+    <ProjectReference Include="..\BoerisCreaciones.Repository\BoerisCreaciones.Repository.csproj" />
+    <ProjectReference Include="..\BoerisCreaciones.Service\BoerisCreaciones.Service.csproj" />
   </ItemGroup>
 
 </Project>

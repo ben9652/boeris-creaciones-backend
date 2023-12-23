@@ -1,10 +1,6 @@
-﻿using BoerisCreaciones.Repository.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using BoerisCreaciones.Repository.Interfaces;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BoerisCreaciones.Repository
 {
