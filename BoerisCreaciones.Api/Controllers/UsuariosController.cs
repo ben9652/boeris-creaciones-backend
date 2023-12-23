@@ -19,6 +19,14 @@ namespace BoerisCreaciones.Api.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
+        public ActionResult<string> Testing(string? optMsg)
+        {
+            string message = "Bienvenido al controlador de Usuarios";
+
+            return optMsg == null ? message : message + " " + optMsg;
+        }
+
         [HttpGet("Autenticar")]
         public ActionResult<MensajeSolicitud> Authenticate([FromBody] Usuario userObj)
         {
@@ -42,7 +50,7 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost("RegistrarUsuario")]
-        public ActionResult<MensajeSolicitud> UserRegister([FromBody] Usuario userObj)
+        public ActionResult<MensajeSolicitud> RegisterUser([FromBody] UsuarioRegistro userObj)
         {
             if(userObj == null)
                 return BadRequest();

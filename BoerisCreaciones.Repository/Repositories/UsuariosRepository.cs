@@ -21,6 +21,23 @@ namespace BoerisCreaciones.Repository.Repositories
             ctx = context;
         }
 
+        private Usuario GetUser(int id)
+        {
+            Usuario user;
+            try
+            {
+                user = ctx.LoadStoredProcedure("ObtenerUsuario", _applicationConfig)
+                    .WithSqlParam("p_id_usuario", id)
+                    .ExecuteSingleResultStoredProcedure<Usuario>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return user;
+        }
+
         public Usuario Authenticate(Usuario userObj)
         {
             Usuario user;
@@ -38,7 +55,7 @@ namespace BoerisCreaciones.Repository.Repositories
             return user;
         }
 
-        public void UserRegister(Usuario userObj)
+        public void RegisterUser(UsuarioRegistro userObj)
         {
             try
             {

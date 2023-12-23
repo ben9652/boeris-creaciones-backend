@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BoerisCreaciones.Service.Services
 {
@@ -60,12 +59,12 @@ namespace BoerisCreaciones.Service.Services
                 throw new InvalidPasswordException("Contraseña incorrecta");
         }
 
-        public void RegisterUser(Usuario user)
+        public void RegisterUser(UsuarioRegistro user)
         {
             try
             {
                 user.password = HashPassword(user.password);
-                _repository.UserRegister(user);
+                _repository.RegisterUser(user);
             }
             catch (Exception ex)
             {
