@@ -1,11 +1,24 @@
+using BoerisCreaciones.Core;
+using BoerisCreaciones.Repository;
+using BoerisCreaciones.Repository.Interfaces;
+using BoerisCreaciones.Repository.Repositories;
+using BoerisCreaciones.Service.Interfaces;
+using BoerisCreaciones.Service.Services;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+var connection = builder.Configuration.GetConnectionString("BoerisCreacionesConnection");
+if (connection == null)
+    Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' no se encuentra en la configuración.'");
+else
+{
+    builder.Services.AddDbContext<BoerisCreacionesContext>(options =>
+    {
+        options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 27)));
+    });
+}
 
 builder.Services.AddCors(options =>
 {
@@ -15,6 +28,22 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod()
     );
 });
+
+builder.Services.AddControllers();
+
+// Esto le dice a la aplicación que, cuando se inyecte una dependencia de tipo IUsuariosRepository, se debe instanciar un UsuariosRepository
+builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>();
+
+// Esto le dice a la aplicación que, cuando se inyecte una dependencia de tipo IUsuariosService, se debe instanciar un UsuariosService
+builder.Services.AddScoped<IUsuariosService, UsuariosService>();
+
+builder.Configuration.Bind("ApplicationConfig", new ApplicationConfig());
+
+builder.Services.AddSingleton(builder.Configuration.Get<ApplicationConfig>());
+
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 

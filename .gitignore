@@ -10,7 +10,7 @@
 # System Files
 .DS_Store
 Thumbs.db
-.editorconfig
+.editorconfige
 *.suo
 **/.vs/
 .vscode/
