@@ -29,8 +29,8 @@ namespace BoerisCreaciones.Api.Controllers
             return optMsg == null ? message : message + " " + optMsg;
         }
 
-        [HttpGet("Autenticar")]
-        public ActionResult<MensajeSolicitud> Authenticate([FromBody] Usuario userObj)
+        [HttpPost("Autenticar")]
+        public ActionResult<MensajeSolicitud> Authenticate([FromBody] UsuarioLogin userObj)
         {
             if (userObj == null)
                 return BadRequest();

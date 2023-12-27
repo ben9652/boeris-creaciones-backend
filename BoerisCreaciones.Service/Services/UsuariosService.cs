@@ -22,7 +22,7 @@ namespace BoerisCreaciones.Service.Services
             _repository = usuariosRepository;
         }
 
-        public Usuario Authenticate(Usuario userObj)
+        public Usuario Authenticate(UsuarioLogin userObj)
         {
             Usuario user;
 

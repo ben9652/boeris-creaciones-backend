@@ -38,7 +38,7 @@ namespace BoerisCreaciones.Repository.Repositories
             return user;
         }
 
-        public Usuario Authenticate(Usuario userObj)
+        public Usuario Authenticate(UsuarioLogin userObj)
         {
             Usuario user;
             try
