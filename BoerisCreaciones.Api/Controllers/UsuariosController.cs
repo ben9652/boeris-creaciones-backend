@@ -51,7 +51,7 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(new MensajeSolicitud(response, error));
         }
 
-        [HttpPost("RegistrarUsuario")]
+        [HttpPost("Registrar")]
         public ActionResult<MensajeSolicitud> RegisterUser([FromBody] UsuarioRegistro userObj)
         {
             if(userObj == null)
