@@ -40,7 +40,6 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 response = _service.Authenticate(userObj);
-                response.password = null;
             }
             catch (Exception ex)
             {

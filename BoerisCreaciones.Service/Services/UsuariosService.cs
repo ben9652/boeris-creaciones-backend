@@ -30,6 +30,7 @@ namespace BoerisCreaciones.Service.Services
             {
                 user = _repository.Authenticate(userObj);
                 PasswordHasher.VerifyPassword(user.password, userObj.password);
+                user.password = null;
             }
             catch (Exception ex)
             {
