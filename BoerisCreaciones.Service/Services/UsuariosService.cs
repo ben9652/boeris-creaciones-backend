@@ -6,6 +6,8 @@ using BoerisCreaciones.Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -48,6 +50,23 @@ namespace BoerisCreaciones.Service.Services
             {
                 throw ex;
             }
+        }
+
+        private void SendMail(string fromMail, string fromPassword, string destinationMail, string subject, string body)
+        {
+            MailMessage message = new MailMessage();
+            message.From = new MailAddress(fromMail);
+            message.Subject = "Asunto de testeo";
+            message.To.Add(new MailAddress(destinationMail));
+            message.Body = "<html><body>" + body + "</body></html>";
+            message.IsBodyHtml = true;
+
+            var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(fromMail, fromPassword),
+                EnableSsl = true
+            };
         }
     }
 }

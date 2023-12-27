@@ -62,8 +62,24 @@ namespace BoerisCreaciones.Repository.Repositories
                 ctx.LoadStoredProcedure("CrearUsuario", _applicationConfig)
                     .WithSqlParam("p_user", userObj.username)
                     .WithSqlParam("p_pass", userObj.password)
+                    .WithSqlParam("p_nombres", userObj.nombres)
+                    .WithSqlParam("p_apellidos", userObj.apellidos)
                     .WithSqlParam("p_email", userObj.email)
+                    .WithSqlParam("p_rol", 'S')
                     .ExecuteVoidStoredProcedure();
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private dynamic GetMailParams()
+        {
+            try
+            {
+                return ctx.LoadStoredProcedure("ObtenerParametrosMail", _applicationConfig)
+                    .ExecuteSingleResultStoredProcedure<dynamic>();
             }
             catch(Exception ex)
             {

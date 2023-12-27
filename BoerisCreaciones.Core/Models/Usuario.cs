@@ -26,9 +26,8 @@ namespace BoerisCreaciones.Core.Models
         [MaxLength(100)]
         public string username { get; set; }
 
-        [Required]
         [MaxLength(100)]
-        public string password { get; set; }
+        public string? password { get; set; }
 
         [Required]
         [MaxLength(50)]

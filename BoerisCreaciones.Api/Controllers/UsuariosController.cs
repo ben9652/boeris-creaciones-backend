@@ -1,6 +1,8 @@
 ﻿using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Net.Mail;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -38,6 +40,7 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 response = _service.Authenticate(userObj);
+                response.password = null;
             }
             catch (Exception ex)
             {
