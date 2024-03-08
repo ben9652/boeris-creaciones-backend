@@ -37,6 +37,10 @@ builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>();
 // Esto le dice a la aplicación que, cuando se inyecte una dependencia de tipo IUsuariosService, se debe instanciar un UsuariosService
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
 
+builder.Services.AddScoped<IMateriasPrimasRepository, MateriasPrimasRepository>();
+
+builder.Services.AddScoped<IMateriasPrimasService, MateriasPrimasService>();
+
 builder.Configuration.Bind("ApplicationConfig", new ApplicationConfig());
 
 builder.Services.AddSingleton(builder.Configuration.Get<ApplicationConfig>());
