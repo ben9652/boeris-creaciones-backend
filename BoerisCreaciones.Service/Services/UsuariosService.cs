@@ -10,6 +10,7 @@ using System.Net.Mail;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Diagnostics;
 
 namespace BoerisCreaciones.Service.Services
 {
@@ -28,7 +29,18 @@ namespace BoerisCreaciones.Service.Services
 
             try
             {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                Console.WriteLine("Ejecución de Authenticate()");
                 user = _repository.Authenticate(userObj);
+                stopwatch.Stop();
+
+                TimeSpan elapsedTime = stopwatch.Elapsed;
+                Console.WriteLine("Tiempo transcurrido: " + elapsedTime.TotalMilliseconds.ToString("0.00") + "ms");
+                Console.WriteLine("");
+                Console.WriteLine("");
+
                 PasswordHasher.VerifyPassword(user.password, userObj.password);
                 user.password = null;
             }

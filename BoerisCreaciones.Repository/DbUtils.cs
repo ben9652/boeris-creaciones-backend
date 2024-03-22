@@ -1,8 +1,8 @@
 ﻿using BoerisCreaciones.Core;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using System.Data.Common;
 using System.Reflection;
+using MySql.Data.MySqlClient;
 
 namespace BoerisCreaciones.Repository
 {
@@ -134,8 +134,16 @@ namespace BoerisCreaciones.Repository
                     {
                         try
                         {
-                            var val = dr.GetValue(colMapping[prop.Name.ToLower()].ColumnOrdinal.Value);
-                            prop.SetValue(obj, val == DBNull.Value ? null : val);
+                            DbColumn colmap = colMapping[prop.Name.ToLower()];
+                            int index = colmap.ColumnOrdinal.Value - 1;
+                            var val = dr.GetValue(index);
+                            if(val is string && val.ToString().Length == 1)
+                            {
+                                char c = val.ToString()[0];
+                                prop.SetValue(obj, c);
+                            }
+                            else
+                                prop.SetValue(obj, val == DBNull.Value ? null : val);
                         }
                         catch (Exception ex)
                         {

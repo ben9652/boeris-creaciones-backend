@@ -29,17 +29,17 @@ namespace BoerisCreaciones.Api.Controllers
             return optMsg == null ? message : message + " " + optMsg;
         }
 
-        [HttpPost("Autenticar")]
-        public ActionResult<MensajeSolicitud> Authenticate([FromBody] UsuarioLogin userObj)
+        [HttpGet("Autenticar")]
+        public ActionResult<MensajeSolicitud> Authenticate(string username, string password)
         {
-            if (userObj == null)
+            if (username == "" || password == "")
                 return BadRequest();
 
             dynamic response;
             bool error = false;
             try
             {
-                response = _service.Authenticate(userObj);
+                response = _service.Authenticate(new UsuarioLogin(username, password));
             }
             catch (Exception ex)
             {

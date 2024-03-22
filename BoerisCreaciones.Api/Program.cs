@@ -5,6 +5,7 @@ using BoerisCreaciones.Repository.Repositories;
 using BoerisCreaciones.Service.Interfaces;
 using BoerisCreaciones.Service.Services;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,8 @@ else
         options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 27)));
     });
 }
+
+MySqlConnection conn = new MySqlConnection(connection);
 
 builder.Services.AddCors(options =>
 {
@@ -72,5 +75,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+
+conn.Open();
 
 app.Run();
