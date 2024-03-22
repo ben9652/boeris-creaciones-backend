@@ -8,14 +8,15 @@ namespace BoerisCreaciones.Core.Models
         {
 
         }
-        public Usuario(int id_usuario, string username, string apellidos, string nombres, string email, string password, string rol)
+        public Usuario(int id_usuario, string username, string password, string apellidos, string nombres, string email, char estado, char rol)
         {
             this.id_usuario = id_usuario;
             this.username = username;
+            this.password = password;
             this.apellidos = apellidos;
             this.nombres = nombres;
             this.email = email;
-            this.password = password;
+            this.estado = estado;
             this.rol = rol;
         }
 
@@ -42,8 +43,10 @@ namespace BoerisCreaciones.Core.Models
         public string email { get; set; }
 
         [Required]
-        [MaxLength(50)]
-        public string rol { get; set; }
+        public char estado { get; set; }
+
+        [Required]
+        public char rol { get; set; }
     }
 
     public class UsuarioLogin

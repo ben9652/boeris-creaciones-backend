@@ -2,9 +2,15 @@
 using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,6 +30,11 @@ namespace BoerisCreaciones.Repository.Repositories
         private Usuario GetUser(int id)
         {
             Usuario user;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Console.WriteLine("Ejecución de Authenticate()");
+
             try
             {
                 user = ctx.LoadStoredProcedure("ObtenerUsuario", _applicationConfig)
@@ -34,22 +45,54 @@ namespace BoerisCreaciones.Repository.Repositories
             {
                 throw ex;
             }
+            stopwatch.Stop();
+
+            TimeSpan elapsedTime = stopwatch.Elapsed;
+            Console.WriteLine("Tiempo transcurrido: " + elapsedTime.TotalMilliseconds.ToString("0.00") + "ms");
+            Console.WriteLine("");
+            Console.WriteLine("");
 
             return user;
         }
-
+        
         public Usuario Authenticate(UsuarioLogin userObj)
         {
-            Usuario user;
-            try
+            Usuario user = null;
+
+            using (MySqlConnection conn = new MySqlConnection(_applicationConfig.ConnectionStrings.BoerisCreacionesConnection))
             {
-                user = ctx.LoadStoredProcedure("ComprobarExistenciaUsuario", _applicationConfig)
-                    .WithSqlParam("p_user", userObj.username)
-                    .ExecuteSingleResultStoredProcedure<Usuario>();
-            }
-            catch(Exception ex)
-            {
-                throw ex;
+                conn.Open();
+                //MySqlCommand cmd = new MySqlCommand("ComprobarExistenciaUsuario", conn);
+                //cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                //cmd.Parameters.AddWithValue("p_user", userObj.username);
+                string queryString = "SELECT * FROM V_MostrarUsuarios WHERE username = @user";
+
+                MySqlCommand cmd = new MySqlCommand(queryString, conn);
+                cmd.Parameters.AddWithValue("@user", userObj.username);
+                cmd.Prepare();
+
+                DbDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    if (Convert.ToChar(reader["estado"]) != 'A')
+                        throw new ArgumentException("El usuario no está activo.");
+
+                    user = new Usuario(
+                        Convert.ToInt32(reader["id_usuario"]),
+                        reader["username"].ToString(),
+                        reader["password"].ToString(),
+                        reader["apellidos"].ToString(),
+                        reader["nombres"].ToString(),
+                        reader["email"].ToString(),
+                        Convert.ToChar(reader["estado"]),
+                        Convert.ToChar(reader["rol"])
+                    );
+                }
+                else
+                    throw new ArgumentException("El usuario no existe.");
+
+                conn.Close();
             }
 
             return user;
