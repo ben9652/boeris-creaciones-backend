@@ -1,3 +1,4 @@
+using BoerisCreaciones.Api;
 using BoerisCreaciones.Core;
 using BoerisCreaciones.Repository;
 using BoerisCreaciones.Repository.Interfaces;
@@ -6,6 +7,10 @@ using BoerisCreaciones.Service.Interfaces;
 using BoerisCreaciones.Service.Services;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
+
+DotNetEnv.Env.Load();
+if (!DotEnv.CheckEnvVars())
+    Console.WriteLine("No están definidas las variables de entorno correctamente.");
 
 var builder = WebApplication.CreateBuilder(args);
 
