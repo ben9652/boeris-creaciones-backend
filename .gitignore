@@ -1,9 +1,7 @@
 # compiled output
 **/obj/
 **/bin/
-/BoerisCreaciones.Api/BoerisCreaciones.Api/publish
-/BoerisCreaciones.Api/BoerisCreaciones.Api/bin
-/BoerisCreaciones.Api/BoerisCreaciones.Api/obj/
+/BoerisCreaciones.Api/.env
 /BoerisCreaciones.Api/publish
 /BoerisCreaciones.Api/bin
 /BoerisCreaciones.Api/obj/
@@ -17,4 +15,3 @@ Thumbs.db
 BoerisCreaciones.Api/Properties/PublishProfiles/FTPProfile.pubxml.user
 **/FTPProfile.pubxml.user
 /BoerisCreaciones.Api/logs
-/BoerisCreaciones.Api/appsettings.json

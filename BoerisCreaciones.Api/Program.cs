@@ -1,3 +1,4 @@
+using BoerisCreaciones.Api;
 using BoerisCreaciones.Core;
 using BoerisCreaciones.Repository;
 using BoerisCreaciones.Repository.Interfaces;
@@ -7,12 +8,16 @@ using BoerisCreaciones.Service.Services;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 
+var envVariable = DotNetEnv.Env.Load();
+if (!DotEnv.CheckEnvVars())
+    Console.WriteLine("No están definidas las variables de entorno necesarias correctamente.");
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connection = builder.Configuration.GetConnectionString("BoerisCreacionesConnection");
 if (connection == null)
-    Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' no se encuentra en la configuración.'");
+    Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' no se encuentra en la configuración.");
 else
 {
     builder.Services.AddDbContext<BoerisCreacionesContext>(options =>
@@ -20,6 +25,10 @@ else
         options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 27)));
     });
 }
+
+connection = DotEnv.ParseConnectionString(connection);
+if (connection == null)
+    Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' está configurada incorrectamente.");
 
 MySqlConnection conn = new MySqlConnection(connection);
 
