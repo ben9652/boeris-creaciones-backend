@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Text.RegularExpressions;
 
     public static class DotEnv
     {
@@ -27,6 +28,31 @@
             }
 
             return doesntExists;
+        }
+
+        public static string? ParseConnectionString(string? connectionString)
+        {
+            if (string.IsNullOrEmpty(connectionString))
+                return null;
+
+            string pattern = @"\${(.*?)}";
+
+            Regex regex = new Regex(pattern);
+
+            MatchCollection matches = regex.Matches(connectionString);
+
+            foreach(Match match in matches)
+            {
+                string subString = match.Groups[1].Value;
+                string? envVar = Environment.GetEnvironmentVariable(subString);
+                if (envVar == null)
+                    return null;
+
+                string replacement = $"${{{subString}}}";
+                connectionString = connectionString.Replace(replacement, envVar);
+            }
+
+            return connectionString;
         }
     }
 }
