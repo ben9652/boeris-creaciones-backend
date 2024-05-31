@@ -9,15 +9,24 @@ using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 
 var envVariable = DotNetEnv.Env.Load();
+
 if (!DotEnv.CheckEnvVars())
+{
     Console.WriteLine("No están definidas las variables de entorno necesarias correctamente.");
+    Console.In.ReadLine();
+    return;
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connection = builder.Configuration.GetConnectionString("BoerisCreacionesConnection");
 if (connection == null)
+{
     Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' no se encuentra en la configuración.");
+    Console.In.ReadLine();
+    return;
+}
 else
 {
     builder.Services.AddDbContext<BoerisCreacionesContext>(options =>
@@ -28,9 +37,19 @@ else
 
 connection = DotEnv.ParseConnectionString(connection);
 if (connection == null)
+{
     Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' está configurada incorrectamente.");
+    Console.In.ReadLine();
+    return;
+}
 
 MySqlConnection conn = new MySqlConnection(connection);
+//if(conn.State == System.Data.ConnectionState.Closed)
+//{
+//    Console.WriteLine("La base de datos no existe o las credenciales son incorrectas. La cadena de conexión es: " + connection);
+//    Console.In.ReadLine();
+//    return;
+//}
 
 builder.Services.AddCors(options =>
 {
@@ -85,6 +104,16 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
-conn.Open();
+try
+{
+    conn.Open();
+}
+catch(Exception ex)
+{
+    Console.WriteLine("La base de datos no existe o las credenciales son incorrectas. La cadena de conexión es: " + connection);
+    Console.WriteLine(ex.Message);
+    Console.In.ReadLine();
+    return;
+}
 
 app.Run();
