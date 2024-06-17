@@ -4,7 +4,7 @@ namespace BoerisCreaciones.Service.Interfaces
 {
     public interface IUsuariosService
     {
-        public Usuario Authenticate(UsuarioLogin userObj);
+        public UsuarioVM Authenticate(UsuarioLogin userObj);
         public void RegisterUser(UsuarioRegistro userObj);
     }
 }

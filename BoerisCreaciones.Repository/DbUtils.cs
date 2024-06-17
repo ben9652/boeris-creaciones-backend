@@ -8,9 +8,9 @@ namespace BoerisCreaciones.Repository
 {
     public static class DbUtils
     {
-        public static MySqlCommand LoadStoredProcedure(this DbContext context, string storedProcedureName, ApplicationConfig _applicationConfig)
+        public static MySqlCommand LoadStoredProcedure(this DbContext context, string storedProcedureName, ConnectionStringProvider _connectionStringProvider)
         {
-            var conn = new MySqlConnection(_applicationConfig.ConnectionStrings.BoerisCreacionesConnection);
+            var conn = new MySqlConnection(_connectionStringProvider.ConnectionString);
             var cmd = conn.CreateCommand();
             cmd.CommandTimeout = 0;
             cmd.CommandText = storedProcedureName;
@@ -18,7 +18,7 @@ namespace BoerisCreaciones.Repository
             return cmd;
         }
 
-        public static MySqlCommand WithSqlParam(this MySqlCommand cmd, string paramName, object paramValue)
+        public static MySqlCommand WithSqlParam(this MySqlCommand cmd, string paramName, object? paramValue)
         {
             if (string.IsNullOrEmpty(cmd.CommandText))
                 throw new InvalidOperationException("Llamá a LoadStoredProcedure antes de usar este método");

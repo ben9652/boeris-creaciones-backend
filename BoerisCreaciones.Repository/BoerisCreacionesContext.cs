@@ -7,6 +7,6 @@ namespace BoerisCreaciones.Repository
     {
         public BoerisCreacionesContext(DbContextOptions<BoerisCreacionesContext> opt) : base(opt) { }
 
-        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<UsuarioVM> Usuarios { get; set; }
     }
 }

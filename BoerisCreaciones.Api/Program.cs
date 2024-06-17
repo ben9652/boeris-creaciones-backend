@@ -72,9 +72,8 @@ builder.Services.AddScoped<IMateriasPrimasRepository, MateriasPrimasRepository>(
 
 builder.Services.AddScoped<IMateriasPrimasService, MateriasPrimasService>();
 
-builder.Configuration.Bind("ApplicationConfig", new ApplicationConfig());
-
-builder.Services.AddSingleton(builder.Configuration.Get<ApplicationConfig>());
+// Agrego como un singleton un objeto para referirse a la cadena de conexión personalizada que obtuve mediante las variables de entorno
+builder.Services.AddSingleton(new ConnectionStringProvider(connection));
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -104,6 +103,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
+// Pruebo una primera conexión a la base de datos para abortar el programa si es que no se conecta correctamente.
 try
 {
     conn.Open();

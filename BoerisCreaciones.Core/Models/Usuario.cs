@@ -2,51 +2,76 @@
 
 namespace BoerisCreaciones.Core.Models
 {
-    public class Usuario
+    public class UsuarioVM
     {
-        public Usuario()
+        public UsuarioVM()
         {
 
         }
-        public Usuario(int id_usuario, string username, string password, string apellidos, string nombres, string email, char estado, char rol)
+
+        public UsuarioVM(
+            int id_usuario,
+            string nombre,
+            string email,
+            string username,
+            string password,
+            DateTime fecha_alta,
+            char rol,
+            char estado,
+            string? domicilio,
+            UInt64? telefono,
+            string? observaciones
+            )
         {
             this.id_usuario = id_usuario;
+            this.nombre = nombre;
+            this.email = email;
             this.username = username;
             this.password = password;
-            this.apellidos = apellidos;
-            this.nombres = nombres;
-            this.email = email;
-            this.estado = estado;
+            this.fecha_alta = fecha_alta;
             this.rol = rol;
+            this.estado = estado;
+            this.domicilio = domicilio;
+            this.telefono = telefono;
+            this.observaciones = observaciones;
         }
 
-        [Key]
         public int id_usuario { get; set; }
-
-        [Required]
-        [MaxLength(100)]
-        public string username { get; set; }
-
-        [MaxLength(100)]
-        public string? password { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string apellidos { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string nombres { get; set; }
-
-        [Required]
-        [MaxLength(100)]
+        public string nombre { get; set; }
         public string email { get; set; }
-
-        [Required]
-        public char estado { get; set; }
-
-        [Required]
+        public string username { get; set; }
+        public string password { get; set; }
+        public DateTime fecha_alta { get; set; }
         public char rol { get; set; }
+        public char estado { get; set; }
+        public string? domicilio { get; set; }
+        public UInt64? telefono { get; set; }
+        public string? observaciones { get; set; }
+    }
+
+    public class UsuarioDTO
+    {
+        public UsuarioDTO()
+        {
+
+        }
+
+        public UsuarioDTO(int id_user, string username, string lastName, string firstName, string email, string role)
+        {
+            this.id_user = id_user;
+            this.username = username;
+            this.lastName = lastName;
+            this.firstName = firstName;
+            this.email = email;
+            this.role = role;
+        }
+
+        public int id_user { get; set; }
+        public string username { get; set; }
+        public string lastName { get; set; }
+        public string firstName { get; set; }
+        public string email { get; set; }
+        public string role { get; set; }
     }
 
     public class UsuarioLogin
@@ -62,49 +87,40 @@ namespace BoerisCreaciones.Core.Models
             this.password = password;
         }
 
-        [Required]
-        [MaxLength(100)]
         public string username { get; set; }
-
-        [Required]
-        [MaxLength(100)]
         public string password { get; set; }
     }
+}
 
-    public class UsuarioRegistro
+public class UsuarioRegistro
+{
+    public UsuarioRegistro(
+        string nombre,
+        string email,
+        string username,
+        string password,
+        char rol,
+        string? domicilio,
+        UInt64? telefono,
+        string? observaciones
+        )
     {
-        public UsuarioRegistro()
-        {
-
-        }
-
-        public UsuarioRegistro(string username, string apellidos, string nombres, string email, string password)
-        {
-            this.username = username;
-            this.apellidos = apellidos;
-            this.nombres = nombres;
-            this.email = email;
-            this.password = password;
-        }
-
-        [Required]
-        [MaxLength(100)]
-        public string username { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string apellidos { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string nombres { get; set; }
-
-        [Required]
-        [MaxLength(100)]
-        public string email { get; set; }
-
-        [Required]
-        [MaxLength(100)]
-        public string password { get; set; }
+        this.nombre = nombre;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.rol = rol;
+        this.domicilio = domicilio;
+        this.telefono = telefono;
+        this.observaciones = observaciones;
     }
+
+    public string nombre { get; set; }
+    public string email { get; set; }
+    public string username { get; set; }
+    public string password { get; set; }
+    public char rol { get; set; }
+    public string? domicilio { get; set; }
+    public UInt64? telefono { get; set; }
+    public string? observaciones { get; set; }
 }

@@ -4,7 +4,7 @@ namespace BoerisCreaciones.Repository.Interfaces
 {
     public interface IUsuariosRepository
     {
-        public Usuario Authenticate(UsuarioLogin userObj);
+        public UsuarioVM Authenticate(UsuarioLogin userObj);
         public void RegisterUser(UsuarioRegistro userObj);
     }
 }

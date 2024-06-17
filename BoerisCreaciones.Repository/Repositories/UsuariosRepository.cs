@@ -16,20 +16,20 @@ using System.Threading.Tasks;
 
 namespace BoerisCreaciones.Repository.Repositories
 {
-    public class UsuariosRepository : Repository<Usuario>, IUsuariosRepository
+    public class UsuariosRepository : Repository<UsuarioVM>, IUsuariosRepository
     {
-        private readonly ApplicationConfig _applicationConfig;
+        private readonly ConnectionStringProvider _connectionStringProvider;
         private readonly BoerisCreacionesContext ctx;
 
-        public UsuariosRepository(ApplicationConfig applicationConfig, BoerisCreacionesContext context) : base(context)
+        public UsuariosRepository(ConnectionStringProvider connectionStringProvider, BoerisCreacionesContext context) : base(context)
         {
-            _applicationConfig = applicationConfig;
+            _connectionStringProvider = connectionStringProvider;
             ctx = context;
         }
 
-        private Usuario GetUser(int id)
+        private UsuarioVM GetUser(int id)
         {
-            Usuario user;
+            UsuarioVM user;
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -37,9 +37,9 @@ namespace BoerisCreaciones.Repository.Repositories
 
             try
             {
-                user = ctx.LoadStoredProcedure("ObtenerUsuario", _applicationConfig)
+                user = ctx.LoadStoredProcedure("ObtenerUsuario", _connectionStringProvider)
                     .WithSqlParam("p_id_usuario", id)
-                    .ExecuteSingleResultStoredProcedure<Usuario>();
+                    .ExecuteSingleResultStoredProcedure<UsuarioVM>();
             }
             catch (Exception ex)
             {
@@ -55,11 +55,11 @@ namespace BoerisCreaciones.Repository.Repositories
             return user;
         }
         
-        public Usuario Authenticate(UsuarioLogin userObj)
+        public UsuarioVM Authenticate(UsuarioLogin userObj)
         {
-            Usuario user = null;
+            UsuarioVM user = null;
 
-            using (MySqlConnection conn = new MySqlConnection(_applicationConfig.ConnectionStrings.BoerisCreacionesConnection))
+            using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 conn.Open();
                 //MySqlCommand cmd = new MySqlCommand("ComprobarExistenciaUsuario", conn);
@@ -78,15 +78,18 @@ namespace BoerisCreaciones.Repository.Repositories
                     if (Convert.ToChar(reader["estado"]) != 'A')
                         throw new ArgumentException("El usuario no está activo.");
 
-                    user = new Usuario(
+                    user = new UsuarioVM(
                         Convert.ToInt32(reader["id_usuario"]),
+                        reader["nombre"].ToString(),
+                        reader["email"].ToString(),
                         reader["username"].ToString(),
                         reader["password"].ToString(),
-                        reader["apellidos"].ToString(),
-                        reader["nombres"].ToString(),
-                        reader["email"].ToString(),
+                        Convert.ToDateTime(reader["fecha_alta"]),
+                        Convert.ToChar(reader["rol"]),
                         Convert.ToChar(reader["estado"]),
-                        Convert.ToChar(reader["rol"])
+                        reader["domicilio"].ToString(),
+                        Convert.ToUInt64(reader["telefono"]),
+                        reader["observaciones"].ToString()
                     );
                 }
                 else
@@ -102,13 +105,15 @@ namespace BoerisCreaciones.Repository.Repositories
         {
             try
             {
-                ctx.LoadStoredProcedure("CrearUsuario", _applicationConfig)
+                ctx.LoadStoredProcedure("CrearUsuario", _connectionStringProvider)
+                    .WithSqlParam("p_nombre", userObj.nombre)
+                    .WithSqlParam("p_email", userObj.email)
                     .WithSqlParam("p_user", userObj.username)
                     .WithSqlParam("p_pass", userObj.password)
-                    .WithSqlParam("p_nombres", userObj.nombres)
-                    .WithSqlParam("p_apellidos", userObj.apellidos)
-                    .WithSqlParam("p_email", userObj.email)
-                    .WithSqlParam("p_rol", 'S')
+                    .WithSqlParam("p_rol", userObj.rol)
+                    .WithSqlParam("p_domicilio", userObj.domicilio)
+                    .WithSqlParam("p_telefono", userObj.telefono)
+                    .WithSqlParam("p_observ", userObj.observaciones)
                     .ExecuteVoidStoredProcedure();
             }
             catch(Exception ex)
@@ -121,7 +126,7 @@ namespace BoerisCreaciones.Repository.Repositories
         {
             try
             {
-                return ctx.LoadStoredProcedure("ObtenerParametrosMail", _applicationConfig)
+                return ctx.LoadStoredProcedure("ObtenerParametrosMail", _connectionStringProvider)
                     .ExecuteSingleResultStoredProcedure<dynamic>();
             }
             catch(Exception ex)
