@@ -92,6 +92,11 @@ namespace BoerisCreaciones.Service.Services
             _repository.UpdateUser(userObj);
         }
 
+        public void DeleteUser(int id)
+        {
+            _repository.DeleteUser(id);
+        }
+
         private void SendMail(string fromMail, string fromPassword, string destinationMail, string subject, string body)
         {
             MailMessage message = new MailMessage();

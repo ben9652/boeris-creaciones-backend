@@ -8,5 +8,6 @@ namespace BoerisCreaciones.Service.Interfaces
         public UsuarioDTO Authenticate(UsuarioLogin userObj);
         public void RegisterUser(UsuarioRegistro userObj);
         public void UpdateUser(UsuarioVM userObj, bool passwordUpdated);
+        public void DeleteUser(int id);
     }
 }

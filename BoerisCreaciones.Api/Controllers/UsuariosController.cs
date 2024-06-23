@@ -80,7 +80,6 @@ namespace BoerisCreaciones.Api.Controllers
         public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
         {
             UsuarioVM user = _service.GetUserById(id);
-
             if (user == null)
                 return NotFound(new MensajeSolicitud("No existe el usuario", true));
 
@@ -96,6 +95,18 @@ namespace BoerisCreaciones.Api.Controllers
             _service.UpdateUser(user, modifiedPassword);
 
             return Ok(new MensajeSolicitud("Cambios realizados con éxito", false));
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult DeleteUser(int id)
+        {
+            UsuarioVM user = _service.GetUserById(id);
+            if (user == null)
+                return NotFound(new MensajeSolicitud("No existe el usuario", true));
+
+            _service.DeleteUser(id);
+
+            return Ok(new MensajeSolicitud("Usuario eliminado con éxito", false));
         }
     }
 }

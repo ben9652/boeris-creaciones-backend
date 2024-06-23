@@ -8,5 +8,6 @@ namespace BoerisCreaciones.Repository.Interfaces
         public UsuarioVM Authenticate(UsuarioLogin userObj);
         public void RegisterUser(UsuarioVM userObj);
         public void UpdateUser(UsuarioVM userObj);
+        public void DeleteUser(int id);
     }
 }

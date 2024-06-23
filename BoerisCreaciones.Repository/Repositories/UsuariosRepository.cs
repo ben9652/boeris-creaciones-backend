@@ -165,17 +165,26 @@ namespace BoerisCreaciones.Repository.Repositories
                 .ExecuteVoidStoredProcedure();
         }
 
+        public void DeleteUser(int id)
+        {
+            using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
+            {
+                conn.Open();
+
+                string queryString = "DELETE FROM Usuarios WHERE id_usuario = @id";
+
+                MySqlCommand cmd = new MySqlCommand(queryString, conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Prepare();
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         private dynamic GetMailParams()
         {
-            try
-            {
-                return ctx.LoadStoredProcedure("ObtenerParametrosMail", _connectionStringProvider)
-                    .ExecuteSingleResultStoredProcedure<dynamic>();
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
+            return ctx.LoadStoredProcedure("ObtenerParametrosMail", _connectionStringProvider)
+                .ExecuteSingleResultStoredProcedure<dynamic>();
         }
     }
 }
