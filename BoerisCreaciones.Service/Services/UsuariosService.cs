@@ -23,46 +23,73 @@ namespace BoerisCreaciones.Service.Services
             _repository = usuariosRepository;
         }
 
-        public UsuarioVM Authenticate(UsuarioLogin userObj)
+        public UsuarioVM GetUserById(int id)
         {
-            UsuarioVM user;
+            UsuarioVM userDatabase;
 
-            try
-            {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
+            userDatabase = _repository.GetUserById(id);
 
-                Console.WriteLine("Ejecución de Authenticate()");
-                user = _repository.Authenticate(userObj);
-                stopwatch.Stop();
+            return userDatabase;
+        }
 
-                TimeSpan elapsedTime = stopwatch.Elapsed;
-                Console.WriteLine("Tiempo transcurrido: " + elapsedTime.TotalMilliseconds.ToString("0.00") + "ms");
-                Console.WriteLine("");
-                Console.WriteLine("");
+        public UsuarioDTO Authenticate(UsuarioLogin userObj)
+        {
+            UsuarioVM userDatabase;
 
-                PasswordHasher.VerifyPassword(user.password, userObj.password);
-                user.password = null;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            string nombre;
+            string apellido;
+
+            Console.WriteLine("Ejecución de Authenticate()");
+            userDatabase = _repository.Authenticate(userObj);
+
+            PasswordHasher.VerifyPassword(userDatabase.password, userObj.password);
+            userDatabase.password = null;
+
+            string[] nombres_apellidos = userDatabase.nombre.Split(',');
+            nombre = nombres_apellidos[0];
+            apellido = nombres_apellidos[1];
+
+            UsuarioDTO user;
+            user = new UsuarioDTO(
+                userDatabase.id_usuario,
+                userDatabase.username,
+                apellido != "-" ? apellido : null,
+                nombre,
+                userDatabase.email,
+                userDatabase.rol
+            );
             
             return user;
         }
 
         public void RegisterUser(UsuarioRegistro user)
         {
-            try
-            {
-                user.password = PasswordHasher.HashPassword(user.password);
-                _repository.RegisterUser(user);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            user.password = PasswordHasher.HashPassword(user.password);
+
+            string nombre = user.nombre + "," + (user.apellido == "" || user.apellido == null ? "-" : user.apellido);
+            UsuarioVM userDB = new UsuarioVM(
+                0,
+                nombre,
+                user.email,
+                user.username,
+                user.password,
+                new DateTime(),
+                user.rol,
+                '0',
+                user.domicilio,
+                user.telefono,
+                user.observaciones
+            );
+
+            _repository.RegisterUser(userDB);
+        }
+
+        public void UpdateUser(UsuarioVM userObj, bool passwordUpdated)
+        {
+            if(passwordUpdated)
+                userObj.password = PasswordHasher.HashPassword(userObj.password);
+
+            _repository.UpdateUser(userObj);
         }
 
         private void SendMail(string fromMail, string fromPassword, string destinationMail, string subject, string body)

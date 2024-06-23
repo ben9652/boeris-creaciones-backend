@@ -1,5 +1,7 @@
 ﻿using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Service.Interfaces;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Mail;
@@ -72,6 +74,28 @@ namespace BoerisCreaciones.Api.Controllers
             }
 
             return Ok(new MensajeSolicitud(response, error));
+        }
+
+        [HttpPatch("{id}")]
+        public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
+        {
+            UsuarioVM user = _service.GetUserById(id);
+
+            if (user == null)
+                return NotFound(new MensajeSolicitud("No existe el usuario", true));
+
+            patchDoc.ApplyTo(user, ModelState);
+            if (!TryValidateModel(user))
+                return ValidationProblem(ModelState);
+
+            bool modifiedPassword = patchDoc.Operations.Find(op => 
+                op.OperationType == OperationType.Replace &&
+                op.path == "password"
+            ) != null;
+
+            _service.UpdateUser(user, modifiedPassword);
+
+            return Ok(new MensajeSolicitud("Cambios realizados con éxito", false));
         }
     }
 }

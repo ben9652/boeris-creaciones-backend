@@ -1,18 +1,8 @@
 ﻿using BoerisCreaciones.Core;
 using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Repository.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Bcpg.OpenPgp;
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
-using System.Diagnostics;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BoerisCreaciones.Repository.Repositories
 {
@@ -27,30 +17,57 @@ namespace BoerisCreaciones.Repository.Repositories
             ctx = context;
         }
 
-        private UsuarioVM GetUser(int id)
+        public UsuarioVM GetUserById(int id)
         {
-            UsuarioVM user;
+            UsuarioVM user = null;
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            Console.WriteLine("Ejecución de Authenticate()");
-
-            try
+            using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
-                user = ctx.LoadStoredProcedure("ObtenerUsuario", _connectionStringProvider)
-                    .WithSqlParam("p_id_usuario", id)
-                    .ExecuteSingleResultStoredProcedure<UsuarioVM>();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            stopwatch.Stop();
+                conn.Open();
 
-            TimeSpan elapsedTime = stopwatch.Elapsed;
-            Console.WriteLine("Tiempo transcurrido: " + elapsedTime.TotalMilliseconds.ToString("0.00") + "ms");
-            Console.WriteLine("");
-            Console.WriteLine("");
+                string queryString = "SELECT * FROM V_MostrarUsuarios WHERE id_usuario = @id";
+
+                MySqlCommand cmd = new MySqlCommand(queryString, conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Prepare();
+
+                DbDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    object domicilioDB = reader["domicilio"];
+                    object telefonoDB = reader["telefono"];
+                    object observacionesDB = reader["observaciones"];
+
+                    int id_usuario = Convert.ToInt32(reader["id_usuario"]);
+                    string? nombre = reader["nombre"].ToString();
+                    string? email = reader["email"].ToString();
+                    string? username = reader["username"].ToString();
+                    string? password = reader["password"].ToString();
+                    DateTime fecha_alta = Convert.ToDateTime(reader["fecha_alta"]);
+                    char rol = Convert.ToChar(reader["rol"]);
+                    char estado = Convert.ToChar(reader["estado"]);
+                    string? domicilio = domicilioDB == DBNull.Value ? null : domicilioDB.ToString();
+                    UInt64? telefono = telefonoDB == DBNull.Value ? null : Convert.ToUInt64(telefonoDB);
+                    string? observaciones = observacionesDB == DBNull.Value ? null : observacionesDB.ToString();
+
+                    user = new UsuarioVM(
+                        id_usuario,
+                        nombre,
+                        email,
+                        username,
+                        password,
+                        fecha_alta,
+                        rol,
+                        estado,
+                        domicilio,
+                        telefono,
+                        observaciones
+                    );
+                }
+
+                conn.Close();
+            }
 
             return user;
         }
@@ -78,18 +95,34 @@ namespace BoerisCreaciones.Repository.Repositories
                     if (Convert.ToChar(reader["estado"]) != 'A')
                         throw new ArgumentException("El usuario no está activo.");
 
+                    object domicilioDB = reader["domicilio"];
+                    object telefonoDB = reader["telefono"];
+                    object observacionesDB = reader["observaciones"];
+
+                    int id_usuario = Convert.ToInt32(reader["id_usuario"]);
+                    string? nombre = reader["nombre"].ToString();
+                    string? email = reader["email"].ToString();
+                    string? username = reader["username"].ToString();
+                    string? password = reader["password"].ToString();
+                    DateTime fecha_alta = Convert.ToDateTime(reader["fecha_alta"]);
+                    char rol = Convert.ToChar(reader["rol"]);
+                    char estado = Convert.ToChar(reader["estado"]);
+                    string? domicilio = domicilioDB == DBNull.Value ? null : domicilioDB.ToString();
+                    UInt64? telefono = telefonoDB == DBNull.Value ? null : Convert.ToUInt64(telefonoDB);
+                    string? observaciones = observacionesDB == DBNull.Value ? null : observacionesDB.ToString();
+
                     user = new UsuarioVM(
-                        Convert.ToInt32(reader["id_usuario"]),
-                        reader["nombre"].ToString(),
-                        reader["email"].ToString(),
-                        reader["username"].ToString(),
-                        reader["password"].ToString(),
-                        Convert.ToDateTime(reader["fecha_alta"]),
-                        Convert.ToChar(reader["rol"]),
-                        Convert.ToChar(reader["estado"]),
-                        reader["domicilio"].ToString(),
-                        Convert.ToUInt64(reader["telefono"]),
-                        reader["observaciones"].ToString()
+                        id_usuario,
+                        nombre,
+                        email,
+                        username,
+                        password,
+                        fecha_alta,
+                        rol,
+                        estado,
+                        domicilio,
+                        telefono,
+                        observaciones
                     );
                 }
                 else
@@ -101,25 +134,35 @@ namespace BoerisCreaciones.Repository.Repositories
             return user;
         }
 
-        public void RegisterUser(UsuarioRegistro userObj)
+        public void RegisterUser(UsuarioVM userObj)
         {
-            try
-            {
-                ctx.LoadStoredProcedure("CrearUsuario", _connectionStringProvider)
-                    .WithSqlParam("p_nombre", userObj.nombre)
-                    .WithSqlParam("p_email", userObj.email)
-                    .WithSqlParam("p_user", userObj.username)
-                    .WithSqlParam("p_pass", userObj.password)
-                    .WithSqlParam("p_rol", userObj.rol)
-                    .WithSqlParam("p_domicilio", userObj.domicilio)
-                    .WithSqlParam("p_telefono", userObj.telefono)
-                    .WithSqlParam("p_observ", userObj.observaciones)
-                    .ExecuteVoidStoredProcedure();
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
+            ctx.LoadStoredProcedure("CrearUsuario", _connectionStringProvider)
+                .WithSqlParam("p_nombre", userObj.nombre)
+                .WithSqlParam("p_email", userObj.email)
+                .WithSqlParam("p_user", userObj.username)
+                .WithSqlParam("p_pass", userObj.password)
+                .WithSqlParam("p_rol", userObj.rol)
+                .WithSqlParam("p_domicilio", userObj.domicilio)
+                .WithSqlParam("p_telefono", userObj.telefono)
+                .WithSqlParam("p_observ", userObj.observaciones)
+                .ExecuteVoidStoredProcedure();
+        }
+
+        public void UpdateUser(UsuarioVM userObj)
+        {
+            ctx.LoadStoredProcedure("ActualizarUsuario", _connectionStringProvider)
+                .WithSqlParam("p_id_usuario", userObj.id_usuario)
+                .WithSqlParam("p_nombre", userObj.nombre)
+                .WithSqlParam("p_email", userObj.email)
+                .WithSqlParam("p_username", userObj.username)
+                .WithSqlParam("p_password", userObj.password)
+                .WithSqlParam("p_fecha_alta", userObj.fecha_alta)
+                .WithSqlParam("p_rol", userObj.rol)
+                .WithSqlParam("p_estado", userObj.estado)
+                .WithSqlParam("p_domicilio", userObj.domicilio)
+                .WithSqlParam("p_telefono", userObj.telefono)
+                .WithSqlParam("p_observaciones", userObj.observaciones)
+                .ExecuteVoidStoredProcedure();
         }
 
         private dynamic GetMailParams()

@@ -47,6 +47,22 @@ namespace BoerisCreaciones.Core.Models
         public string? domicilio { get; set; }
         public UInt64? telefono { get; set; }
         public string? observaciones { get; set; }
+
+        public override string ToString()
+        {
+            return
+                "ID de usuario: " + id_usuario + '\n' +
+                "Nombre: " + nombre + '\n' +
+                "E-mail: " + email + '\n' +
+                "Nombre de usuario: " + username + '\n' +
+                "Contraseña: " + password + '\n' +
+                "Fecha de alta: " + fecha_alta + '\n' +
+                "Rol: " + rol + '\n' +
+                "Estado: " + estado + '\n' +
+                "Domicilio: " + domicilio + '\n' +
+                "Teléfono: " + telefono + '\n' +
+                "Observaciones: " + observaciones + '\n';
+        }
     }
 
     public class UsuarioDTO
@@ -56,7 +72,14 @@ namespace BoerisCreaciones.Core.Models
 
         }
 
-        public UsuarioDTO(int id_user, string username, string lastName, string firstName, string email, string role)
+        public UsuarioDTO(
+            int id_user,
+            string username,
+            string? lastName,
+            string firstName,
+            string email,
+            char role
+            )
         {
             this.id_user = id_user;
             this.username = username;
@@ -68,10 +91,10 @@ namespace BoerisCreaciones.Core.Models
 
         public int id_user { get; set; }
         public string username { get; set; }
-        public string lastName { get; set; }
+        public string? lastName { get; set; }
         public string firstName { get; set; }
         public string email { get; set; }
-        public string role { get; set; }
+        public char role { get; set; }
     }
 
     public class UsuarioLogin
@@ -90,37 +113,40 @@ namespace BoerisCreaciones.Core.Models
         public string username { get; set; }
         public string password { get; set; }
     }
-}
 
-public class UsuarioRegistro
-{
-    public UsuarioRegistro(
-        string nombre,
-        string email,
-        string username,
-        string password,
-        char rol,
-        string? domicilio,
-        UInt64? telefono,
-        string? observaciones
-        )
+    public class UsuarioRegistro
     {
-        this.nombre = nombre;
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.rol = rol;
-        this.domicilio = domicilio;
-        this.telefono = telefono;
-        this.observaciones = observaciones;
-    }
+        public UsuarioRegistro(
+            string nombre,
+            string? apellido,
+            string email,
+            string username,
+            string password,
+            char rol,
+            string? domicilio,
+            UInt64? telefono,
+            string? observaciones
+            )
+        {
+            this.nombre = nombre;
+            this.apellido = apellido;
+            this.email = email;
+            this.username = username;
+            this.password = password;
+            this.rol = rol;
+            this.domicilio = domicilio;
+            this.telefono = telefono;
+            this.observaciones = observaciones;
+        }
 
-    public string nombre { get; set; }
-    public string email { get; set; }
-    public string username { get; set; }
-    public string password { get; set; }
-    public char rol { get; set; }
-    public string? domicilio { get; set; }
-    public UInt64? telefono { get; set; }
-    public string? observaciones { get; set; }
+        public string nombre { get; set; }
+        public string? apellido { get; set; }
+        public string email { get; set; }
+        public string username { get; set; }
+        public string password { get; set; }
+        public char rol { get; set; }
+        public string? domicilio { get; set; }
+        public UInt64? telefono { get; set; }
+        public string? observaciones { get; set; }
+    }
 }

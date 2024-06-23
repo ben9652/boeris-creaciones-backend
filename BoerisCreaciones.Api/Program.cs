@@ -7,6 +7,7 @@ using BoerisCreaciones.Service.Interfaces;
 using BoerisCreaciones.Service.Services;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json.Serialization;
 
 var envVariable = DotNetEnv.Env.Load();
 
@@ -61,6 +62,11 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
+builder.Services.AddControllers().AddNewtonsoftJson(s =>
+{
+    s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+});
 
 // Esto le dice a la aplicación que, cuando se inyecte una dependencia de tipo IUsuariosRepository, se debe instanciar un UsuariosRepository
 builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>();
