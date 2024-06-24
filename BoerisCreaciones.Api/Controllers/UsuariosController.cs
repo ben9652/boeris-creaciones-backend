@@ -1,10 +1,13 @@
-﻿using BoerisCreaciones.Core.Models;
+﻿using AutoMapper;
+using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Mail;
+using System.Security.Claims;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -14,36 +17,49 @@ namespace BoerisCreaciones.Api.Controllers
     {
         private readonly IUsuariosService _service;
         private readonly ILogger<UsuariosController> _logger;
+        private readonly IMapper _mapper;
 
         private const string MENSAJE_EXITO = "Éxito";
 
-        public UsuariosController(IUsuariosService service, ILogger<UsuariosController> logger)
+        public UsuariosController(IUsuariosService service, ILogger<UsuariosController> logger, IMapper mapper)
         {
             _service = service;
             _logger = logger;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public ActionResult<string> Testing(string? optMsg)
+        [Authorize]
+        public ActionResult<UsuarioDTO> GetAuthenticatedUser()
         {
-            string message = "Bienvenido al controlador de Usuarios";
+            string stringId = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
+            int userId = Convert.ToInt32(stringId);
+            UsuarioVM userDatabase = _service.GetUserById(Convert.ToInt32(userId));
 
-            return optMsg == null ? message : message + " " + optMsg;
+            UsuarioDTO user = _mapper.Map<UsuarioDTO>(userDatabase);
+
+            return Ok(user);
         }
 
-        [HttpGet("Autenticar")]
-        public ActionResult<MensajeSolicitud> Authenticate(string username, string password)
+        [HttpPost]
+        public ActionResult<MensajeSolicitud> Login(UsuarioLogin credentials)
         {
-            if (username == "" || password == "")
-                return BadRequest();
+            if (credentials.username == "" || credentials.password == "")
+                return BadRequest(new MensajeSolicitud("Deben llenarse los 2 campos", true));
 
-            dynamic response;
             bool error = false;
+            dynamic response = MENSAJE_EXITO;
+            UsuarioDTO user = null;
             try
             {
-                response = _service.Authenticate(new UsuarioLogin(username, password));
+                user = _service.Authenticate(credentials);
+                if (user == null)
+                    return NotFound(new MensajeSolicitud("No existe el usuario", true));
+
+                var token = _service.GenerateToken(user);
+                response = token;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
                 response = ex.Message;
@@ -54,6 +70,7 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost("Registrar")]
+        [Authorize(Roles = "a")]
         public ActionResult<MensajeSolicitud> RegisterUser(UsuarioRegistro userObj)
         {
             if(userObj == null)
@@ -77,6 +94,7 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize]
         public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
         {
             UsuarioVM user = _service.GetUserById(id);
@@ -98,6 +116,7 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "a")]
         public ActionResult DeleteUser(int id)
         {
             UsuarioVM user = _service.GetUserById(id);

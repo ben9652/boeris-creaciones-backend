@@ -5,9 +5,12 @@ using BoerisCreaciones.Repository.Interfaces;
 using BoerisCreaciones.Repository.Repositories;
 using BoerisCreaciones.Service.Interfaces;
 using BoerisCreaciones.Service.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Serialization;
+using System.Text;
 
 var envVariable = DotNetEnv.Env.Load();
 
@@ -68,6 +71,22 @@ builder.Services.AddControllers().AddNewtonsoftJson(s =>
     s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 });
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+
 // Esto le dice a la aplicación que, cuando se inyecte una dependencia de tipo IUsuariosRepository, se debe instanciar un UsuariosRepository
 builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>();
 
@@ -77,6 +96,8 @@ builder.Services.AddScoped<IUsuariosService, UsuariosService>();
 builder.Services.AddScoped<IMateriasPrimasRepository, MateriasPrimasRepository>();
 
 builder.Services.AddScoped<IMateriasPrimasService, MateriasPrimasService>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Agrego como un singleton un objeto para referirse a la cadena de conexión personalizada que obtuve mediante las variables de entorno
 builder.Services.AddSingleton(new ConnectionStringProvider(connection));
@@ -100,6 +121,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
