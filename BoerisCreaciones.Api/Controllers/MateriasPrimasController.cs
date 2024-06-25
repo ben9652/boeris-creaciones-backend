@@ -1,5 +1,6 @@
 ﻿using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoerisCreaciones.Api.Controllers
@@ -19,7 +20,7 @@ namespace BoerisCreaciones.Api.Controllers
             _logger = logger;
         }
 
-        [HttpGet("Listar")]
+        [HttpGet]
         public ActionResult<MensajeSolicitud> ListRawMaterials()
         {
             dynamic response;

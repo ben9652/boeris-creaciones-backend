@@ -1,5 +1,6 @@
 ﻿namespace BoerisCreaciones.Api
 {
+    using BoerisCreaciones.Service;
     using System;
     using System.IO;
     using System.Text.RegularExpressions;
@@ -13,11 +14,14 @@
                 "MYSQL__DATABASE__SERVER",
                 "MYSQL__DATABASE__USER",
                 "MYSQL__DATABASE__PASSWORD",
-                "MYSQL__DATABASE__DBNAME"
+                "MYSQL__DATABASE__DBNAME",
+                "JWT__KEY",
+                "JWT__ISSUER",
+                "JWT__AUDIENCE"
             };
 
             bool doesntExists = true;
-            foreach(string envVar in vars)
+            foreach (string envVar in vars)
             {
                 string? s;
                 if ((s = Environment.GetEnvironmentVariable(envVar)) == null)
@@ -41,7 +45,7 @@
 
             MatchCollection matches = regex.Matches(connectionString);
 
-            foreach(Match match in matches)
+            foreach (Match match in matches)
             {
                 string subString = match.Groups[1].Value;
                 string? envVar = Environment.GetEnvironmentVariable(subString);
