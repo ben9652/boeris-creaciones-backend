@@ -67,6 +67,13 @@ namespace BoerisCreaciones.Service.Services
             return user;
         }
 
+        public bool CheckPassword(int id, string password)
+        {
+            UsuarioVM user = _repository.GetUserById(id);
+            PasswordHasher.VerifyPassword(user.password, password);
+            return true;
+        }
+
         public string GenerateToken(UsuarioDTO userObj)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

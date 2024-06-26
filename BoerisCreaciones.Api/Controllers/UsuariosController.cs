@@ -41,6 +41,22 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(user);
         }
 
+        [HttpGet("ComprobarPassword")]
+        [Authorize]
+        public ActionResult<bool> CheckPassword(int id, string password)
+        {
+            try
+            {
+                _service.CheckPassword(id, password);
+            }
+            catch(Exception ex)
+            {
+                return Ok(false);
+            }
+
+            return Ok(true);
+        }
+
         [HttpPost]
         public ActionResult<MensajeSolicitud> Login(UsuarioLogin credentials)
         {
