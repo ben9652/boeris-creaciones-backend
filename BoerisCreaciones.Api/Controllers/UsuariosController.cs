@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
@@ -28,6 +29,12 @@ namespace BoerisCreaciones.Api.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("Testing")]
+        public ActionResult<string> Test(string? optStr)
+        {
+            return Ok("Bienvenido al controlador de usuarios " + optStr);
+        }
+
         [HttpGet]
         [Authorize]
         public ActionResult<UsuarioDTO> GetAuthenticatedUser()
@@ -49,7 +56,7 @@ namespace BoerisCreaciones.Api.Controllers
             {
                 _service.CheckPassword(id, password);
             }
-            catch(Exception ex)
+            catch (Exception)
             {
                 return Ok(false);
             }
@@ -113,6 +120,9 @@ namespace BoerisCreaciones.Api.Controllers
         [Authorize]
         public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
         {
+            if (!IsUserAuthenticated(id))
+                return BadRequest();
+
             UsuarioVM user = _service.GetUserById(id);
             if (user == null)
                 return NotFound(new MensajeSolicitud("No existe el usuario", true));
@@ -128,7 +138,9 @@ namespace BoerisCreaciones.Api.Controllers
 
             _service.UpdateUser(user, modifiedPassword);
 
-            return Ok(new MensajeSolicitud("Cambios realizados con éxito", false));
+            UsuarioDTO userClient= _mapper.Map<UsuarioDTO>(user);
+
+            return Ok(userClient);
         }
 
         [HttpDelete("{id}")]
@@ -142,6 +154,13 @@ namespace BoerisCreaciones.Api.Controllers
             _service.DeleteUser(id);
 
             return Ok(new MensajeSolicitud("Usuario eliminado con éxito", false));
+        }
+
+        private bool IsUserAuthenticated(int id)
+        {
+            var claimsOfUser = HttpContext.User.Identities.First().Claims;
+            string serialNumber = claimsOfUser.First().Value;
+            return id == Convert.ToInt32(serialNumber);
         }
     }
 }
