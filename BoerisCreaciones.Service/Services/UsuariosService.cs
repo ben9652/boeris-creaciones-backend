@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
 
 namespace BoerisCreaciones.Service.Services
 {
@@ -65,6 +66,13 @@ namespace BoerisCreaciones.Service.Services
             );
             
             return user;
+        }
+
+        public bool CheckPassword(int id, string password)
+        {
+            UsuarioVM user = _repository.GetUserById(id);
+            PasswordHasher.VerifyPassword(user.password, password);
+            return true;
         }
 
         public string GenerateToken(UsuarioDTO userObj)

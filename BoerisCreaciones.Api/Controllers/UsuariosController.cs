@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
@@ -28,6 +29,12 @@ namespace BoerisCreaciones.Api.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("Testing")]
+        public ActionResult<string> Test(string? optStr)
+        {
+            return Ok("Bienvenido al controlador de usuarios " + optStr);
+        }
+
         [HttpGet]
         [Authorize]
         public ActionResult<UsuarioDTO> GetAuthenticatedUser()
@@ -39,6 +46,22 @@ namespace BoerisCreaciones.Api.Controllers
             UsuarioDTO user = _mapper.Map<UsuarioDTO>(userDatabase);
 
             return Ok(user);
+        }
+
+        [HttpGet("ComprobarPassword")]
+        [Authorize]
+        public ActionResult<bool> CheckPassword(int id, string password)
+        {
+            try
+            {
+                _service.CheckPassword(id, password);
+            }
+            catch (Exception)
+            {
+                return Ok(false);
+            }
+
+            return Ok(true);
         }
 
         [HttpPost]
@@ -97,6 +120,9 @@ namespace BoerisCreaciones.Api.Controllers
         [Authorize]
         public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
         {
+            if (!IsUserAuthenticated(id))
+                return BadRequest();
+
             UsuarioVM user = _service.GetUserById(id);
             if (user == null)
                 return NotFound(new MensajeSolicitud("No existe el usuario", true));
@@ -105,14 +131,27 @@ namespace BoerisCreaciones.Api.Controllers
             if (!TryValidateModel(user))
                 return ValidationProblem(ModelState);
 
+            if (patchDoc.Operations.Count == 0)
+                return NoContent();
+
             bool modifiedPassword = patchDoc.Operations.Find(op => 
                 op.OperationType == OperationType.Replace &&
                 op.path == "password"
             ) != null;
 
-            _service.UpdateUser(user, modifiedPassword);
+            try
+            {
+                _service.UpdateUser(user, modifiedPassword);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Ok(new MensajeSolicitud(ex.Message, true));
+            }
 
-            return Ok(new MensajeSolicitud("Cambios realizados con éxito", false));
+            UsuarioDTO userClient= _mapper.Map<UsuarioDTO>(user);
+
+            return Ok(new MensajeSolicitud(userClient, false));
         }
 
         [HttpDelete("{id}")]
@@ -126,6 +165,13 @@ namespace BoerisCreaciones.Api.Controllers
             _service.DeleteUser(id);
 
             return Ok(new MensajeSolicitud("Usuario eliminado con éxito", false));
+        }
+
+        private bool IsUserAuthenticated(int id)
+        {
+            var claimsOfUser = HttpContext.User.Identities.First().Claims;
+            string serialNumber = claimsOfUser.First().Value;
+            return id == Convert.ToInt32(serialNumber);
         }
     }
 }

@@ -2,6 +2,7 @@
 using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Repository.Interfaces;
 using MySql.Data.MySqlClient;
+using System.Data;
 using System.Data.Common;
 
 namespace BoerisCreaciones.Repository.Repositories
@@ -150,19 +151,35 @@ namespace BoerisCreaciones.Repository.Repositories
 
         public void UpdateUser(UsuarioVM userObj)
         {
+            using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
+            {
+                conn.Open();
+
+                string queryString = "SELECT * FROM V_MostrarUsuarios WHERE username = @username";
+
+                MySqlCommand cmd = new MySqlCommand(queryString, conn);
+                cmd.Parameters.AddWithValue("@username", userObj.username);
+                cmd.Prepare();
+
+                DbDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                    throw new DuplicateNameException("El nombre de usuario ya existe");
+            }
+
             ctx.LoadStoredProcedure("ActualizarUsuario", _connectionStringProvider)
-                .WithSqlParam("p_id_usuario", userObj.id_usuario)
-                .WithSqlParam("p_nombre", userObj.nombre)
-                .WithSqlParam("p_email", userObj.email)
-                .WithSqlParam("p_username", userObj.username)
-                .WithSqlParam("p_password", userObj.password)
-                .WithSqlParam("p_fecha_alta", userObj.fecha_alta)
-                .WithSqlParam("p_rol", userObj.rol)
-                .WithSqlParam("p_estado", userObj.estado)
-                .WithSqlParam("p_domicilio", userObj.domicilio)
-                .WithSqlParam("p_telefono", userObj.telefono)
-                .WithSqlParam("p_observaciones", userObj.observaciones)
-                .ExecuteVoidStoredProcedure();
+                    .WithSqlParam("p_id_usuario", userObj.id_usuario)
+                    .WithSqlParam("p_nombre", userObj.nombre)
+                    .WithSqlParam("p_email", userObj.email)
+                    .WithSqlParam("p_username", userObj.username)
+                    .WithSqlParam("p_password", userObj.password)
+                    .WithSqlParam("p_fecha_alta", userObj.fecha_alta)
+                    .WithSqlParam("p_rol", userObj.rol)
+                    .WithSqlParam("p_estado", userObj.estado)
+                    .WithSqlParam("p_domicilio", userObj.domicilio)
+                    .WithSqlParam("p_telefono", userObj.telefono)
+                    .WithSqlParam("p_observaciones", userObj.observaciones)
+                    .ExecuteVoidStoredProcedure();
         }
 
         public void DeleteUser(int id)
