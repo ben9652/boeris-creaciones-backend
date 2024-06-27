@@ -131,16 +131,27 @@ namespace BoerisCreaciones.Api.Controllers
             if (!TryValidateModel(user))
                 return ValidationProblem(ModelState);
 
+            if (patchDoc.Operations.Count == 0)
+                return NoContent();
+
             bool modifiedPassword = patchDoc.Operations.Find(op => 
                 op.OperationType == OperationType.Replace &&
                 op.path == "password"
             ) != null;
 
-            _service.UpdateUser(user, modifiedPassword);
+            try
+            {
+                _service.UpdateUser(user, modifiedPassword);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Ok(new MensajeSolicitud(ex.Message, true));
+            }
 
             UsuarioDTO userClient= _mapper.Map<UsuarioDTO>(user);
 
-            return Ok(userClient);
+            return Ok(new MensajeSolicitud(userClient, false));
         }
 
         [HttpDelete("{id}")]
