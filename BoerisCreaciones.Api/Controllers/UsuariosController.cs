@@ -117,7 +117,7 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize]
+        [Authorize(Roles = "a")]
         public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
         {
             if (!IsUserAuthenticated(id))
