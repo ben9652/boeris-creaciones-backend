@@ -80,9 +80,7 @@ namespace BoerisCreaciones.Repository.Repositories
             using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 conn.Open();
-                //MySqlCommand cmd = new MySqlCommand("ComprobarExistenciaUsuario", conn);
-                //cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                //cmd.Parameters.AddWithValue("p_user", userObj.username);
+
                 string queryString = "SELECT * FROM V_MostrarUsuarios WHERE username = @user";
 
                 MySqlCommand cmd = new MySqlCommand(queryString, conn);
