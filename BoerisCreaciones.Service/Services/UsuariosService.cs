@@ -21,8 +21,8 @@ namespace BoerisCreaciones.Service.Services
 {
     public class UsuariosService : IUsuariosService
     {
-        private readonly IUsuariosRepository _repository;
-        private readonly IConfiguration _config;
+        protected readonly IUsuariosRepository _repository;
+        protected readonly IConfiguration _config;
 
         public UsuariosService(IUsuariosRepository usuariosRepository, IConfiguration config)
         {
@@ -75,14 +75,11 @@ namespace BoerisCreaciones.Service.Services
             return true;
         }
 
-        public string GenerateToken(UsuarioDTO userObj)
+        public string GenerateToken(UsuarioDTO userObj, List<string>? additional_roles)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            // TODO: Estos roles serán los propios que tengan los herederos de Usuarios, que pueden ser varios.
-            // Cuando esté implementado el modelo de datos se debería llenar este arreglo con los roles de los Socios.
-            var additional_roles = new List<string> {  };
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.SerialNumber, userObj.id_user.ToString()),
@@ -93,8 +90,9 @@ namespace BoerisCreaciones.Service.Services
                 new Claim(ClaimTypes.Role, userObj.role.ToString())
             };
 
-            claims.AddRange(additional_roles.Select(role => new Claim(ClaimTypes.Role, role)));
-            
+            if (additional_roles != null && additional_roles.Count != 0)
+                claims.AddRange(additional_roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
             var token = new JwtSecurityToken(
                 _config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
@@ -111,7 +109,7 @@ namespace BoerisCreaciones.Service.Services
             user.password = PasswordHasher.HashPassword(user.password);
 
             string nombre = user.nombre + "," + (user.apellido == "" || user.apellido == null ? "-" : user.apellido);
-            UsuarioVM userDB = new UsuarioVM(
+            UsuarioVM userDB = new(
                 0,
                 nombre,
                 user.email,

@@ -17,14 +17,16 @@ namespace BoerisCreaciones.Api.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly IUsuariosService _service;
+        private readonly IRolesSociosService _partnersRolesService;
         private readonly ILogger<UsuariosController> _logger;
         private readonly IMapper _mapper;
 
         private const string MENSAJE_EXITO = "Éxito";
 
-        public UsuariosController(IUsuariosService service, ILogger<UsuariosController> logger, IMapper mapper)
+        public UsuariosController(IUsuariosService service, IRolesSociosService partnersRolesService, ILogger<UsuariosController> logger, IMapper mapper)
         {
             _service = service;
+            _partnersRolesService = partnersRolesService;
             _logger = logger;
             _mapper = mapper;
         }
@@ -72,15 +74,20 @@ namespace BoerisCreaciones.Api.Controllers
 
             bool error = false;
             dynamic response = MENSAJE_EXITO;
-            UsuarioDTO user = null;
+            UsuarioDTO? user = null;
             try
             {
                 user = _service.Authenticate(credentials);
                 if (user == null)
                     return NotFound(new MensajeSolicitud("No existe el usuario", true));
 
-                var token = _service.GenerateToken(user);
-                response = token;
+                if(user.role == 's')
+                {
+                    List<string> roles = _partnersRolesService.GetPartnerRoles(user.id_user);
+                    response = _service.GenerateToken(user, roles);
+                }
+                else
+                    response = _service.GenerateToken(user, null);
             }
             catch(Exception ex)
             {
@@ -117,7 +124,7 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize(Roles = "a")]
+        [Authorize(Roles = "a,sa")]
         public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
         {
             if (!IsUserAuthenticated(id))

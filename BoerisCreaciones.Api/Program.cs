@@ -89,12 +89,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 // Esto le dice a la aplicación que, cuando se inyecte una dependencia de tipo IUsuariosRepository, se debe instanciar un UsuariosRepository
 builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>();
+builder.Services.AddScoped<ISociosRepository, SociosRepository>();
+builder.Services.AddScoped<IRolesSociosRepository, RolesSociosRepository>();
+builder.Services.AddScoped<IMateriasPrimasRepository, MateriasPrimasRepository>();
 
 // Esto le dice a la aplicación que, cuando se inyecte una dependencia de tipo IUsuariosService, se debe instanciar un UsuariosService
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
-
-builder.Services.AddScoped<IMateriasPrimasRepository, MateriasPrimasRepository>();
-
+builder.Services.AddScoped<ISociosService, SociosService>();
+builder.Services.AddScoped<IRolesSociosService, RolesSociosService>();
 builder.Services.AddScoped<IMateriasPrimasService, MateriasPrimasService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
