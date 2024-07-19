@@ -124,7 +124,7 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize(Roles = "a,sa")]
+        [Authorize(Roles = "a,s")]
         public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
         {
             if (!IsUserAuthenticated(id))
@@ -141,14 +141,13 @@ namespace BoerisCreaciones.Api.Controllers
             if (patchDoc.Operations.Count == 0)
                 return NoContent();
 
-            bool modifiedPassword = patchDoc.Operations.Find(op => 
-                op.OperationType == OperationType.Replace &&
-                op.path == "password"
-            ) != null;
+            List<string> attributes = new();
+            foreach(Operation<UsuarioVM> ops in patchDoc.Operations)
+                attributes.Add(ops.path);
 
             try
             {
-                _service.UpdateUser(user, modifiedPassword);
+                _service.UpdateUser(user, attributes);
             }
             catch(Exception ex)
             {
