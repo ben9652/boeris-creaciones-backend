@@ -22,6 +22,7 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public ActionResult<List<TipoSocioDTO>> GetPossibleRoles()
         {
             List<TipoSocioDTO> roles = null;

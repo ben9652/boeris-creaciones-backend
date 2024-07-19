@@ -9,7 +9,7 @@ namespace BoerisCreaciones.Service.Interfaces
         public bool CheckPassword(int id, string password);
         public string GenerateToken(UsuarioDTO userObj, List<string>? additional_roles);
         public void RegisterUser(UsuarioRegistro userObj);
-        public void UpdateUser(UsuarioVM userObj, bool passwordUpdated);
+        public void UpdateUser(UsuarioVM userObj, List<string> attributesToChange);
         public void DeleteUser(int id);
     }
 }

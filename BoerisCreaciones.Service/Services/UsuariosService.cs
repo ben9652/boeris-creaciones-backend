@@ -126,12 +126,12 @@ namespace BoerisCreaciones.Service.Services
             _repository.RegisterUser(userDB);
         }
 
-        public void UpdateUser(UsuarioVM userObj, bool passwordUpdated)
+        public void UpdateUser(UsuarioVM userObj, List<string> attributesToChange)
         {
-            if(passwordUpdated)
+            if (attributesToChange.Find(attr => attr == "password") != null)
                 userObj.password = PasswordHasher.HashPassword(userObj.password);
 
-            _repository.UpdateUser(userObj);
+            _repository.UpdateUser(userObj, attributesToChange);
         }
 
         public void DeleteUser(int id)

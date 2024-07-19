@@ -147,7 +147,7 @@ namespace BoerisCreaciones.Repository.Repositories
                 .ExecuteVoidStoredProcedure();
         }
 
-        public void UpdateUser(UsuarioVM userObj)
+        public void UpdateUser(UsuarioVM userObj, List<string> attributesToChange)
         {
             using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
@@ -161,7 +161,7 @@ namespace BoerisCreaciones.Repository.Repositories
 
                 DbDataReader reader = cmd.ExecuteReader();
 
-                if (reader.Read())
+                if (reader.Read() && attributesToChange.Find(attr => attr == "username") != null)
                     throw new DuplicateNameException("El nombre de usuario ya existe");
             }
 
