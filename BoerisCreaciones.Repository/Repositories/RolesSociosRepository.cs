@@ -31,13 +31,25 @@ namespace BoerisCreaciones.Repository.Repositories
             {
                 conn.Open();
 
-                string queryString = "SELECT * FROM V_MostrarRolesSocios WHERE id_usuario = @id";
+                string queryString = "SELECT * FROM V_MostrarSocios WHERE id_usuario = @id";
 
                 MySqlCommand cmd = new MySqlCommand(queryString, conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 cmd.Prepare();
 
                 DbDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                    throw new Exception("No existe el socio con el ID especificado.");
+
+                reader.Close();
+
+                queryString = "SELECT * FROM V_MostrarRolesSocios WHERE id_usuario = @id";
+
+                cmd = new MySqlCommand(queryString, conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Prepare();
+
+                reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {

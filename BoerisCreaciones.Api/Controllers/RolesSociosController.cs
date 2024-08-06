@@ -38,6 +38,24 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(roles);
         }
 
+        [HttpGet("{id}")]
+        [Authorize(Roles = "a,s")]
+        public ActionResult<List<string>> GetRoles(int id)
+        {
+            List<string> roles = null;
+            try
+            {
+                roles = _service.GetPartnerRoles(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+
+            return Ok(roles);
+        }
+
         [HttpPost("{id}")]
         [Authorize(Roles = "a,sa")]
         public ActionResult AssignRoles(int id, List<int> roles)
