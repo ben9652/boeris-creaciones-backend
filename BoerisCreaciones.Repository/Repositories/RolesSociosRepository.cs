@@ -15,12 +15,10 @@ namespace BoerisCreaciones.Repository.Repositories
     public class RolesSociosRepository : IRolesSociosRepository
     {
         private readonly ConnectionStringProvider _connectionStringProvider;
-        private readonly BoerisCreacionesContext ctx;
 
-        public RolesSociosRepository(ConnectionStringProvider connectionStringProvider, BoerisCreacionesContext context)
+        public RolesSociosRepository(ConnectionStringProvider connectionStringProvider)
         {
             _connectionStringProvider = connectionStringProvider;
-            ctx = context;
         }
 
         public List<TipoSocioVM> GetPartnerRoles(int id)
