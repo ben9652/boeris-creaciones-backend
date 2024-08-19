@@ -4,10 +4,10 @@ namespace BoerisCreaciones.Service.Interfaces
 {
     public interface IRubrosMateriasPrimasService
     {
-        public List<RubroMateriaPrima> GetRawMaterialsCategories();
-        public RubroMateriaPrima GetRawMaterialsCategory(int id);
+        public List<RubroMateriaPrimaDTO> GetRawMaterialsCategories();
+        public RubroMateriaPrimaDTO GetRawMaterialsCategory(int id);
         public void CreateRawMaterialCategory(string category);
-        public void ModifyRawMaterialCategory(RubroMateriaPrima category, List<string> attributesToChange);
+        public void ModifyRawMaterialCategory(RubroMateriaPrimaDTO category, List<string> attributesToChange);
         public void DeleteRawMaterialCategory(int id);
     }
 }

@@ -16,9 +16,9 @@ namespace BoerisCreaciones.Repository.Repositories
             _connectionStringProvider = connectionStringProvider;
         }
 
-        public List<RubroMateriaPrima> GetRawMaterialsCategories()
+        public List<RubroMateriaPrimaVM> GetRawMaterialsCategories()
         {
-            List<RubroMateriaPrima> rubrosMP = new List<RubroMateriaPrima>();
+            List<RubroMateriaPrimaVM> rubrosMP = new List<RubroMateriaPrimaVM>();
             using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 conn.Open();
@@ -30,7 +30,7 @@ namespace BoerisCreaciones.Repository.Repositories
 
                 while (reader.Read())
                 {
-                    RubroMateriaPrima rubroMP = new RubroMateriaPrima(
+                    RubroMateriaPrimaVM rubroMP = new RubroMateriaPrimaVM(
                         Convert.ToInt32(reader["id_rubroMP"]),
                         reader["nombre"].ToString()
                     );
@@ -43,9 +43,9 @@ namespace BoerisCreaciones.Repository.Repositories
             return rubrosMP;
         }
 
-        public RubroMateriaPrima GetRawMaterialsCategory(int id)
+        public RubroMateriaPrimaVM GetRawMaterialsCategory(int id)
         {
-            RubroMateriaPrima rubroMP = null;
+            RubroMateriaPrimaVM rubroMP = null;
             using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 conn.Open();
@@ -59,7 +59,7 @@ namespace BoerisCreaciones.Repository.Repositories
 
                 if (reader.Read())
                 {
-                    rubroMP = new RubroMateriaPrima(
+                    rubroMP = new RubroMateriaPrimaVM(
                         Convert.ToInt32(reader["id_rubroMP"]),
                         reader["nombre"].ToString()
                     );
@@ -105,7 +105,7 @@ namespace BoerisCreaciones.Repository.Repositories
             }
         }
 
-        public void ModifyRawMaterialCategory(RubroMateriaPrima category, List<string> attributesToChange)
+        public void ModifyRawMaterialCategory(RubroMateriaPrimaVM category, List<string> attributesToChange)
         {
             using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
