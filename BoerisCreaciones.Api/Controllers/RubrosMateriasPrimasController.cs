@@ -1,9 +1,11 @@
 ﻿using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Core.Models.Rubros;
 using BoerisCreaciones.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -21,9 +23,10 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<RubroMateriaPrima>> GetRawMaterialCategories()
+        [Authorize(Roles = "a,sa")]
+        public ActionResult<List<RubroMateriaPrimaDTO>> GetRawMaterialCategories()
         {
-            List<RubroMateriaPrima> rubros = new List<RubroMateriaPrima>();
+            List<RubroMateriaPrimaDTO> rubros = new List<RubroMateriaPrimaDTO>();
             try
             {
                 rubros = _service.GetRawMaterialsCategories();
@@ -31,14 +34,15 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return Ok(new MensajeSolicitud(ex.Message, true));
+                return BadRequest(ex.Message);
             }
 
             return Ok(rubros);
         }
 
         [HttpPost]
-        public ActionResult CreateRawMaterialCategory(string name)
+        [Authorize(Roles = "a,sa")]
+        public ActionResult<RubroMateriaPrimaDTO> CreateRawMaterialCategory(string name)
         {
             try
             {
@@ -47,18 +51,19 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return Ok(new MensajeSolicitud(ex.Message, true));
+                return BadRequest(ex.Message);
             }
 
             return NoContent();
         }
 
         [HttpPatch("{id}")]
-        public ActionResult<MensajeSolicitud> ModifyRawMaterialCategory(int id, JsonPatchDocument<RubroMateriaPrima> patchDoc)
+        [Authorize(Roles = "a,sa")]
+        public ActionResult<RubroMateriaPrimaDTO> ModifyRawMaterialCategory(int id, JsonPatchDocument<RubroMateriaPrimaDTO> patchDoc)
         {
-            RubroMateriaPrima category = _service.GetRawMaterialsCategory(id);
+            RubroMateriaPrimaDTO category = _service.GetRawMaterialsCategory(id);
             if (category == null)
-                return NotFound(new MensajeSolicitud("No existe el rubro especificado", true));
+                return NotFound("No existe el rubro especificado");
 
             patchDoc.ApplyTo(category, ModelState);
             if (!TryValidateModel(category))
@@ -68,7 +73,7 @@ namespace BoerisCreaciones.Api.Controllers
                 return NoContent();
 
             List<string> attributes = new();
-            foreach (Operation<RubroMateriaPrima> ops in patchDoc.Operations)
+            foreach (Operation<RubroMateriaPrimaDTO> ops in patchDoc.Operations)
                 attributes.Add(ops.path);
 
             try
@@ -78,23 +83,29 @@ namespace BoerisCreaciones.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return Ok(new MensajeSolicitud(ex.Message, true));
+                return BadRequest(ex.Message);
             }
 
-            return Ok(new MensajeSolicitud(category, false));
+            return Ok(category);
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "a,sa")]
         public ActionResult DeleteRawMaterialCategory(int id)
         {
             try
             {
                 _service.DeleteRawMaterialCategory(id);
             }
+            catch(MySqlException ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(412, "El rubro que se quiere eliminar está siendo utilizado por una materia prima");
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return StatusCode(412, new MensajeSolicitud(ex.Message, true));
+                return StatusCode(412, ex.Message);
             }
 
             return NoContent();

@@ -1,4 +1,5 @@
-﻿using BoerisCreaciones.Core.Models.Rubros;
+﻿using AutoMapper;
+using BoerisCreaciones.Core.Models.Rubros;
 using BoerisCreaciones.Repository.Interfaces;
 using BoerisCreaciones.Service.Interfaces;
 using System;
@@ -12,20 +13,27 @@ namespace BoerisCreaciones.Service.Services
     public class RubrosMateriasPrimasService : IRubrosMateriasPrimasService
     {
         private readonly IRubrosMateriasPrimasRepository _repository;
+        private readonly IMapper _mapper;
 
-        public RubrosMateriasPrimasService(IRubrosMateriasPrimasRepository repository)
+        public RubrosMateriasPrimasService(IRubrosMateriasPrimasRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
-        public List<RubroMateriaPrima> GetRawMaterialsCategories()
+        public List<RubroMateriaPrimaDTO> GetRawMaterialsCategories()
         {
-            return _repository.GetRawMaterialsCategories();
+            List<RubroMateriaPrimaVM> rubrosMateriasPrimasBD = _repository.GetRawMaterialsCategories();
+            List<RubroMateriaPrimaDTO> rubrosMateriasPrimas = new List<RubroMateriaPrimaDTO>();
+            foreach(RubroMateriaPrimaVM rubroMateriaPrimaBD in rubrosMateriasPrimasBD)
+                rubrosMateriasPrimas.Add(_mapper.Map<RubroMateriaPrimaDTO>(rubroMateriaPrimaBD));
+
+            return rubrosMateriasPrimas;
         }
 
-        public RubroMateriaPrima GetRawMaterialsCategory(int id)
+        public RubroMateriaPrimaDTO GetRawMaterialsCategory(int id)
         {
-            return _repository.GetRawMaterialsCategory(id);
+            return _mapper.Map<RubroMateriaPrimaDTO>(_repository.GetRawMaterialsCategory(id));
         }
 
         public void CreateRawMaterialCategory(string category)
@@ -34,10 +42,12 @@ namespace BoerisCreaciones.Service.Services
             _repository.CreateRawMaterialCategory(category);
         }
 
-        public void ModifyRawMaterialCategory(RubroMateriaPrima category, List<string> attributesToChange)
+        public void ModifyRawMaterialCategory(RubroMateriaPrimaDTO category, List<string> attributesToChange)
         {
-            category.nombre = char.ToUpper(category.nombre[0]) + category.nombre.Substring(1);
-            _repository.ModifyRawMaterialCategory(category, attributesToChange);
+            RubroMateriaPrimaVM categoryDB = _mapper.Map<RubroMateriaPrimaVM>(category);
+
+            categoryDB.nombre = char.ToUpper(categoryDB.nombre[0]) + categoryDB.nombre.Substring(1);
+            _repository.ModifyRawMaterialCategory(categoryDB, attributesToChange);
         }
 
         public void DeleteRawMaterialCategory(int id)
