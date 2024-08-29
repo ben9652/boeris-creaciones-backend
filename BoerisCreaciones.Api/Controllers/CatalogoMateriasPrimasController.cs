@@ -66,7 +66,7 @@ namespace BoerisCreaciones.Api.Controllers
         {
             MateriasPrimasItemDTO item = _service.GetRawMaterialsItem(id);
             if (item == null)
-                return NotFound("No existe el rubro especificado");
+                return NotFound("No existe la materia prima especificada");
 
             patchDoc.ApplyTo(item, ModelState);
             if (!TryValidateModel(item))

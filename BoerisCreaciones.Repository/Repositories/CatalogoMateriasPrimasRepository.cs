@@ -133,7 +133,11 @@ namespace BoerisCreaciones.Repository.Repositories
                 DbDataReader reader = cmd.ExecuteReader();
 
                 if (reader.Read() && attributesToChange.Find(attr => attr == "nombre") != null)
-                    throw new DuplicateWaitObjectException("El nombre de la materia prima ya existe");
+                {
+                    string? nombre = reader["nombre"].ToString();
+                    if(item.nombre == nombre)
+                        throw new DuplicateWaitObjectException("El nombre de la materia prima ya existe");
+                }
 
                 reader.Close();
             }

@@ -119,7 +119,7 @@ namespace BoerisCreaciones.Repository.Repositories
                 DbDataReader reader = cmd.ExecuteReader();
 
                 if (reader.Read() && attributesToChange.Find(attr => attr == "nombre") != null)
-                    throw new DuplicateNameException("El rubro de materia especificado ya existe");
+                    throw new DuplicateNameException("El rubro de materia prima especificado ya existe");
 
                 reader.Close();
 
