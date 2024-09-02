@@ -39,6 +39,24 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(catalogoProveedores);
         }
 
+        [HttpGet("{id}")]
+        public ActionResult GetProvider(int id)
+        {
+            ProveedorDTO proveedor = null;
+
+            try
+            {
+                proveedor = _service.GetProvider(id);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return NotFound(ex.Message);
+            }
+
+            return Ok(proveedor);
+        }
+
         [HttpPost]
         [Authorize(Roles = "a,sa")]
         public ActionResult CreateProvider(ProveedorDTO proveedor)
