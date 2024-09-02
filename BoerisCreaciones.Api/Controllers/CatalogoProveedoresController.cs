@@ -40,6 +40,7 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "a,sa")]
         public ActionResult GetProvider(int id)
         {
             ProveedorDTO proveedor = null;
