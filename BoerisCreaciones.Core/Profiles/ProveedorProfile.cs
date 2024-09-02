@@ -14,7 +14,7 @@ namespace BoerisCreaciones.Core.Profiles
                 .ForMember(dest => dest.category, opt => opt.MapFrom(src => new RubroMateriaPrimaDTO(src.id_rubro, src.rubroAsociado)))
                 .ForMember(dest => dest.residence, opt => opt.MapFrom(src => src.domicilio))
                 .ForMember(dest => dest.phone, opt => opt.MapFrom(src => src.telefono))
-                .ForMember(dest => dest.cvu_or_alias, opt => opt.MapFrom(src => src.cvu.Length != 0 ? src.cvu : src.alias))
+                .ForMember(dest => dest.cvu_or_alias, opt => opt.MapFrom(src => src.cvu != null && src.cvu.Length != 0 ? src.cvu : src.alias))
                 ;
         }
     }
@@ -30,8 +30,8 @@ namespace BoerisCreaciones.Core.Profiles
                 .ForMember(dest => dest.rubroAsociado, opt => opt.MapFrom(src => src.category.name))
                 .ForMember(dest => dest.domicilio, opt => opt.MapFrom(src => src.residence))
                 .ForMember(dest => dest.telefono, opt => opt.MapFrom(src => src.phone))
-                .ForMember(dest => dest.cvu, opt => opt.MapFrom(src => IsDigitsOnly(src.cvu_or_alias) ? src.cvu_or_alias : null))
-                .ForMember(dest => dest.alias, opt => opt.MapFrom(src => !IsDigitsOnly(src.cvu_or_alias) ? src.cvu_or_alias : null))
+                .ForMember(dest => dest.cvu, opt => opt.MapFrom(src => src.cvu_or_alias != null && IsDigitsOnly(src.cvu_or_alias) ? src.cvu_or_alias : null))
+                .ForMember(dest => dest.alias, opt => opt.MapFrom(src => src.cvu_or_alias != null && !IsDigitsOnly(src.cvu_or_alias) ? src.cvu_or_alias : null))
                 ;
         }
 

@@ -9,7 +9,7 @@ namespace BoerisCreaciones.Core.Models.Proveedores
 
         }
 
-        public ProveedorVM(int id, string nombre, int id_rubro, string rubroAsociado, string domicilio, long telefono, string? cvu, string? alias)
+        public ProveedorVM(int id, string nombre, int id_rubro, string rubroAsociado, string? domicilio, long? telefono, string? cvu, string? alias)
         {
             this.id = id;
             this.nombre = nombre;
@@ -25,8 +25,8 @@ namespace BoerisCreaciones.Core.Models.Proveedores
         public string nombre { get; set; }
         public int id_rubro { get; set; }
         public string rubroAsociado { get; set; }
-        public string domicilio { get; set; }
-        public long telefono { get; set; }
+        public string? domicilio { get; set; }
+        public long? telefono { get; set; }
         public string? cvu { get; set; }
         public string? alias { get; set; }
     }
@@ -38,7 +38,7 @@ namespace BoerisCreaciones.Core.Models.Proveedores
 
         }
 
-        public ProveedorDTO(int id, string name, RubroMateriaPrimaDTO category, string residence, long phone, string cvu_or_alias)
+        public ProveedorDTO(int id, string name, RubroMateriaPrimaDTO category, string? residence, long? phone, string? cvu_or_alias)
         {
             this.id = id;
             this.name = name;
@@ -51,8 +51,8 @@ namespace BoerisCreaciones.Core.Models.Proveedores
         public int id { get; set; }
         public string name { get; set; }
         public RubroMateriaPrimaDTO category { get; set; }
-        public string residence { get; set; }
-        public long phone { get; set; }
-        public string cvu_or_alias { get; set; }
+        public string? residence { get; set; }
+        public long? phone { get; set; }
+        public string? cvu_or_alias { get; set; }
     }
 }

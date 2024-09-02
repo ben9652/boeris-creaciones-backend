@@ -16,7 +16,7 @@ var envVariable = DotNetEnv.Env.Load();
 
 if (!DotEnv.CheckEnvVars())
 {
-    Console.WriteLine("No están definidas las variables de entorno necesarias correctamente.");
+    Console.WriteLine("No estï¿½n definidas las variables de entorno necesarias correctamente.");
     Console.In.ReadLine();
     return;
 }
@@ -27,7 +27,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connection = builder.Configuration.GetConnectionString("BoerisCreacionesConnection");
 if (connection == null)
 {
-    Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' no se encuentra en la configuración.");
+    Console.WriteLine("La cadena de conexiï¿½n 'BoerisCreacionesConnection' no se encuentra en la configuraciï¿½n.");
     Console.In.ReadLine();
     return;
 }
@@ -42,7 +42,7 @@ else
 connection = DotEnv.ParseConnectionString(connection);
 if (connection == null)
 {
-    Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' está configurada incorrectamente.");
+    Console.WriteLine("La cadena de conexiï¿½n 'BoerisCreacionesConnection' estï¿½ configurada incorrectamente.");
     Console.In.ReadLine();
     return;
 }
@@ -50,7 +50,7 @@ if (connection == null)
 MySqlConnection conn = new MySqlConnection(connection);
 //if(conn.State == System.Data.ConnectionState.Closed)
 //{
-//    Console.WriteLine("La base de datos no existe o las credenciales son incorrectas. La cadena de conexión es: " + connection);
+//    Console.WriteLine("La base de datos no existe o las credenciales son incorrectas. La cadena de conexiï¿½n es: " + connection);
 //    Console.In.ReadLine();
 //    return;
 //}
@@ -87,7 +87,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-// Esto le dice a la aplicación que, cuando se inyecte una dependencia de tipo IUsuariosRepository, se debe instanciar un UsuariosRepository
+// Esto le dice a la aplicaciï¿½n que, cuando se inyecte una dependencia de tipo IUsuariosRepository, se debe instanciar un UsuariosRepository
 builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>();
 builder.Services.AddScoped<ISociosRepository, SociosRepository>();
 builder.Services.AddScoped<IRolesSociosRepository, RolesSociosRepository>();
@@ -96,8 +96,9 @@ builder.Services.AddScoped<IUnidadesRepository, UnidadesRepository>();
 builder.Services.AddScoped<ICatalogoMateriasPrimasRepository, CatalogoMateriasPrimasRepository>();
 builder.Services.AddScoped<ICatalogoProductosRepository, CatalogoProductosRepository>();
 builder.Services.AddScoped<IRubrosProductosRepository, RubrosProductosRepository>();
+builder.Services.AddScoped<ICatalogoProveedoresRepository, CatalogoProveedoresRepository>();
 
-// Esto le dice a la aplicación que, cuando se inyecte una dependencia de tipo IUsuariosService, se debe instanciar un UsuariosService
+// Esto le dice a la aplicaciï¿½n que, cuando se inyecte una dependencia de tipo IUsuariosService, se debe instanciar un UsuariosService
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
 builder.Services.AddScoped<ISociosService, SociosService>();
 builder.Services.AddScoped<IRolesSociosService, RolesSociosService>();
@@ -105,10 +106,11 @@ builder.Services.AddScoped<IRubrosMateriasPrimasService, RubrosMateriasPrimasSer
 builder.Services.AddScoped<IUnidadesService, UnidadesService>();
 builder.Services.AddScoped<ICatalogoMateriasPrimasService, CatalogoMateriasPrimasService>();
 builder.Services.AddScoped<ICatalogoProductosService, CatalogoProductosService>();
+builder.Services.AddScoped<ICatalogoProveedoresService, CatalogoProveedoresService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// Agrego como un singleton un objeto para referirse a la cadena de conexión personalizada que obtuve mediante las variables de entorno
+// Agrego como un singleton un objeto para referirse a la cadena de conexiï¿½n personalizada que obtuve mediante las variables de entorno
 builder.Services.AddSingleton(new ConnectionStringProvider(connection));
 
 builder.Services.AddEndpointsApiExplorer();
@@ -140,14 +142,14 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
-// Pruebo una primera conexión a la base de datos para abortar el programa si es que no se conecta correctamente.
+// Pruebo una primera conexiï¿½n a la base de datos para abortar el programa si es que no se conecta correctamente.
 try
 {
     conn.Open();
 }
 catch(Exception ex)
 {
-    Console.WriteLine("La base de datos no existe o las credenciales son incorrectas. La cadena de conexión es: " + connection);
+    Console.WriteLine("La base de datos no existe o las credenciales son incorrectas. La cadena de conexiï¿½n es: " + connection);
     Console.WriteLine(ex.Message);
     Console.In.ReadLine();
     return;

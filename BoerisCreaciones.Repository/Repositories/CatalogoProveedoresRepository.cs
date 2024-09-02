@@ -2,12 +2,7 @@
 using BoerisCreaciones.Core.Models.Proveedores;
 using BoerisCreaciones.Repository.Interfaces;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BoerisCreaciones.Repository.Repositories
 {
@@ -38,9 +33,13 @@ namespace BoerisCreaciones.Repository.Repositories
 
                 while (reader.Read())
                 {
+                    object domicilioDB = reader["domicilio"];
+                    object telefonoDB = reader["telefono"];
                     object cvuDB = reader["cvu"];
                     object aliasDB = reader["alias"];
 
+                    string? domicilio = domicilioDB == DBNull.Value ? null : domicilioDB.ToString();
+                    long? telefono = telefonoDB == DBNull.Value ? null : Convert.ToInt64(telefonoDB);
                     string? cvu = cvuDB == DBNull.Value ? null : cvuDB.ToString();
                     string? alias = aliasDB == DBNull.Value ? null : aliasDB.ToString();
 
@@ -49,8 +48,8 @@ namespace BoerisCreaciones.Repository.Repositories
                         reader["nombre"].ToString(),
                         Convert.ToInt32(reader["id_rubro"]),
                         reader["rubroAsociado"].ToString(),
-                        reader["domicilio"].ToString(),
-                        Convert.ToInt64(reader["telefono"]),
+                        domicilio,
+                        telefono,
                         cvu,
                         alias
                     );
@@ -80,9 +79,13 @@ namespace BoerisCreaciones.Repository.Repositories
 
                 if (reader.Read())
                 {
+                    object domicilioDB = reader["domicilio"];
+                    object telefonoDB = reader["telefono"];
                     object cvuDB = reader["cvu"];
                     object aliasDB = reader["alias"];
 
+                    string? domicilio = domicilioDB == DBNull.Value ? null : domicilioDB.ToString();
+                    long? telefono = telefonoDB == DBNull.Value ? null : Convert.ToInt64(telefonoDB);
                     string? cvu = cvuDB == DBNull.Value ? null : cvuDB.ToString();
                     string? alias = aliasDB == DBNull.Value ? null : aliasDB.ToString();
 
@@ -91,8 +94,8 @@ namespace BoerisCreaciones.Repository.Repositories
                         reader["nombre"].ToString(),
                         Convert.ToInt32(reader["id_rubro"]),
                         reader["rubroAsociado"].ToString(),
-                        reader["domicilio"].ToString(),
-                        Convert.ToInt64(reader["telefono"]),
+                        domicilio,
+                        telefono,
                         cvu,
                         alias
                     );
@@ -152,7 +155,7 @@ namespace BoerisCreaciones.Repository.Repositories
         public void DeleteProvider(int id)
         {
             _ctx.LoadStoredProcedure("EliminarProveedor", _connectionString)
-                .WithSqlParam("p_id", id)
+                .WithSqlParam("p_id_usuario", id)
                 .ExecuteSingleResultStoredProcedure<ProveedorVM>();
         }
     }
