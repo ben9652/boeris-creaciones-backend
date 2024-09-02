@@ -1,5 +1,4 @@
-﻿using BoerisCreaciones.Core.Models;
-using BoerisCreaciones.Core.Models.Rubros;
+﻿using BoerisCreaciones.Core.Models.Rubros;
 using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
