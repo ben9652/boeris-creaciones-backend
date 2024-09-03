@@ -97,6 +97,7 @@ builder.Services.AddScoped<ICatalogoMateriasPrimasRepository, CatalogoMateriasPr
 builder.Services.AddScoped<ICatalogoProductosRepository, CatalogoProductosRepository>();
 builder.Services.AddScoped<IRubrosProductosRepository, RubrosProductosRepository>();
 builder.Services.AddScoped<ICatalogoProveedoresRepository, CatalogoProveedoresRepository>();
+builder.Services.AddScoped<IProvinciasRepository, ProvinciasRepository>();
 
 // Esto le dice a la aplicaci�n que, cuando se inyecte una dependencia de tipo IUsuariosService, se debe instanciar un UsuariosService
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
@@ -107,6 +108,7 @@ builder.Services.AddScoped<IUnidadesService, UnidadesService>();
 builder.Services.AddScoped<ICatalogoMateriasPrimasService, CatalogoMateriasPrimasService>();
 builder.Services.AddScoped<ICatalogoProductosService, CatalogoProductosService>();
 builder.Services.AddScoped<ICatalogoProveedoresService, CatalogoProveedoresService>();
+builder.Services.AddScoped<IProvinciasService, ProvinciasService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
