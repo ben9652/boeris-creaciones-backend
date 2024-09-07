@@ -1,4 +1,4 @@
-﻿using BoerisCreaciones.Core.Models;
+﻿using BoerisCreaciones.Core.Models.Provincias;
 using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -13,7 +13,7 @@ namespace BoerisCreaciones.Api.Controllers
     {
         private readonly IProvinciasService _service;
         private readonly ILogger<ProvinciasController> _logger;
-
+        
         public ProvinciasController(IProvinciasService service, ILogger<ProvinciasController> logger)
         {
             _service = service;
@@ -21,7 +21,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
+#if RELEASE
         [Authorize(Roles = "a")]
+#endif
         public ActionResult GetAllProvinces()
         {
             List<ProvinciaDTO> provincias = new List<ProvinciaDTO>();
@@ -39,8 +41,28 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(provincias);
         }
 
+        [HttpGet("Expanded")]
+        public ActionResult GetAllProvincesFull()
+        {
+            List<ProvinciaExpandedDTO> provincias = new List<ProvinciaExpandedDTO>();
+
+            try
+            {
+                provincias = _service.GetAllProvincesWithLocalities();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return NotFound(ex.Message);
+            }
+
+            return Ok(provincias);
+        }
+
         [HttpPost]
+#if RELEASE
         [Authorize(Roles = "a")]
+#endif
         public ActionResult CreateProvince(ProvinciaDTO provincia)
         {
             try
@@ -57,7 +79,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
+#if RELEASE
         [Authorize(Roles = "a")]
+#endif
         public ActionResult UpdateProvince(int id, JsonPatchDocument<ProvinciaDTO> patchDoc)
         {
             ProvinciaDTO provincia = _service.GetProvince(id);
@@ -89,7 +113,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+#if RELEASE
         [Authorize(Roles = "a")]
+#endif
         public ActionResult DeleteProvince(int id)
         {
             try

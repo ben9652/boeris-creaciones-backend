@@ -1,5 +1,4 @@
-﻿using AutoMapper.Configuration.Annotations;
-using BoerisCreaciones.Core.Models.Rubros;
+﻿using BoerisCreaciones.Core.Models.Rubros;
 using BoerisCreaciones.Core.Models.Unidades;
 
 namespace BoerisCreaciones.Core.Models.MateriasPrimas

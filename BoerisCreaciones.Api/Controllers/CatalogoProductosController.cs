@@ -21,7 +21,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<List<ProductosItemDTO>> GetAllProducts()
         {
             List<ProductosItemDTO> productos = new List<ProductosItemDTO>();
@@ -40,7 +42,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<ProductosItemDTO> GetProductById(int id)
         {
             ProductosItemDTO producto = null;
@@ -59,7 +63,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<ProductosItemDTO> CreateProduct(ProductosItemDTO item)
         {
             try
@@ -76,7 +82,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult UpdateProduct(int id, JsonPatchDocument<ProductosItemDTO> patchDoc)
         {
             ProductosItemDTO item = _service.GetProductsItem(id);
@@ -108,7 +116,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult DeleteProduct(int id)
         {
             try

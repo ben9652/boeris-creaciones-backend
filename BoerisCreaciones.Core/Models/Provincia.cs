@@ -1,4 +1,7 @@
-﻿namespace BoerisCreaciones.Core.Models
+﻿using BoerisCreaciones.Core.Models.Localidades;
+using System.Collections;
+
+namespace BoerisCreaciones.Core.Models.Provincias
 {
     public class ProvinciaVM
     {
@@ -32,5 +35,20 @@
 
         public int id { get; set; }
         public string name { get; set; }
+    }
+
+    public class ProvinciaExpandedDTO : ProvinciaDTO
+    {
+        public ProvinciaExpandedDTO(int id, string name) : base(id, name)
+        {
+            localities = new List<LocalidadExpandedDTO>();
+        }
+
+        public ProvinciaExpandedDTO()
+        {
+            localities = new List<LocalidadExpandedDTO>();
+        }
+
+        public List<LocalidadExpandedDTO> localities { get; set; }
     }
 }

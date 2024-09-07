@@ -23,7 +23,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<List<SocioDTO>> GetPartners()
         {
             List<SocioDTO> partners = null;
@@ -40,7 +42,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<SocioDTO> RegisterPartner(SocioRegistro partnerObj)
         {
             if (partnerObj == null)
@@ -61,7 +65,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
         
         [HttpDelete("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult DeletePartner(int id)
         {
             try

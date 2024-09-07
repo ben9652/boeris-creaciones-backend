@@ -21,7 +21,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<List<MateriasPrimasItemDTO>> Get()
         {
             List<MateriasPrimasItemDTO> catalogoMateriasPrimas = new List<MateriasPrimasItemDTO>();
@@ -40,7 +42,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<MateriasPrimasItemDTO> Create(MateriasPrimasItemDTO itemMateriaPrima)
         {
             char origen = itemMateriaPrima.source;
@@ -61,7 +65,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult Update(int id, JsonPatchDocument<MateriasPrimasItemDTO> patchDoc)
         {
             MateriasPrimasItemDTO item = _service.GetRawMaterialsItem(id);
@@ -93,7 +99,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult Delete(int id)
         {
             try

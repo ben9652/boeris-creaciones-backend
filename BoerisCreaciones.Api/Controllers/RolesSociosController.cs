@@ -22,7 +22,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
+#if RELEASE
         [Authorize]
+#endif
         public ActionResult<List<TipoSocioDTO>> GetPossibleRoles()
         {
             List<TipoSocioDTO> roles = null;
@@ -39,7 +41,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,s")]
+#endif
         public ActionResult<List<string>> GetRoles(int id)
         {
             List<string> roles = null;
@@ -57,7 +61,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult AssignRoles(int id, List<int> roles)
         {
             try
@@ -73,7 +79,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPut("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult UpdateRoles(int id, List<int> roles)
         {
             try
@@ -89,7 +97,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult DeleteRoles(int id)
         {
             try

@@ -1,9 +1,7 @@
 ﻿using BoerisCreaciones.Core;
-using BoerisCreaciones.Core.Models;
+using BoerisCreaciones.Core.Models.Provincias;
 using BoerisCreaciones.Repository.Interfaces;
 using MySql.Data.MySqlClient;
-using MySqlConnector.Logging;
-using System.Data;
 using System.Data.Common;
 
 namespace BoerisCreaciones.Repository.Repositories
