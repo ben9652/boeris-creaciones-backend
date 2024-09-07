@@ -22,7 +22,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<List<RubroMateriaPrimaDTO>> GetRawMaterialCategories()
         {
             List<RubroMateriaPrimaDTO> rubros = new List<RubroMateriaPrimaDTO>();
@@ -40,7 +42,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<RubroMateriaPrimaDTO> CreateRawMaterialCategory(string name)
         {
             try
@@ -57,7 +61,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult<RubroMateriaPrimaDTO> ModifyRawMaterialCategory(int id, JsonPatchDocument<RubroMateriaPrimaDTO> patchDoc)
         {
             RubroMateriaPrimaDTO category = _service.GetRawMaterialsCategory(id);
@@ -89,7 +95,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult DeleteRawMaterialCategory(int id)
         {
             try

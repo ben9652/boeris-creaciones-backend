@@ -38,7 +38,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
+#if RELEASE
         [Authorize]
+#endif
         public ActionResult<UsuarioDTO> GetAuthenticatedUser()
         {
             string stringId = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
@@ -51,7 +53,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet("ComprobarPassword")]
+#if RELEASE
         [Authorize]
+#endif
         public ActionResult<bool> CheckPassword(int id, string password)
         {
             try
@@ -100,7 +104,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost("Registrar")]
+#if RELEASE
         [Authorize(Roles = "a")]
+#endif
         public ActionResult<MensajeSolicitud> RegisterUser(UsuarioRegistro userObj)
         {
             if(userObj == null)
@@ -124,7 +130,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,s")]
+#endif
         public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
         {
             if (!IsUserAuthenticated(id))
@@ -161,7 +169,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+#if RELEASE
         [Authorize(Roles = "a")]
+#endif
         public ActionResult DeleteUser(int id)
         {
             UsuarioVM user = _service.GetUserById(id);

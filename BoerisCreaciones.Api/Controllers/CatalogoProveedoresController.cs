@@ -21,7 +21,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult GetProviders()
         {
             List<ProveedorDTO> catalogoProveedores = new List<ProveedorDTO>();
@@ -40,7 +42,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult GetProvider(int id)
         {
             ProveedorDTO proveedor = null;
@@ -59,7 +63,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult CreateProvider(ProveedorDTO proveedor)
         {
             try
@@ -76,7 +82,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPatch("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult UpdateProvider(int id, JsonPatchDocument<ProveedorDTO> patchDoc)
         {
             ProveedorDTO provider = _service.GetProvider(id);
@@ -108,7 +116,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+#if RELEASE
         [Authorize(Roles = "a,sa")]
+#endif
         public ActionResult DeleteProvider(int id)
         {
             try

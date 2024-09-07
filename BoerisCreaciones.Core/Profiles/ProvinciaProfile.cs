@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BoerisCreaciones.Core.Models;
+using BoerisCreaciones.Core.Models.Provincias;
 
 namespace BoerisCreaciones.Core.Profiles
 {
@@ -8,6 +8,17 @@ namespace BoerisCreaciones.Core.Profiles
         public ProvinciaVMtoDTOProfile()
         {
             CreateMap<ProvinciaVM, ProvinciaDTO>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_provincia))
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
+                ;
+        }
+    }
+
+    public class ProvinciaVMtoExpandedDTOProfile : Profile
+    {
+        public ProvinciaVMtoExpandedDTOProfile()
+        {
+            CreateMap<ProvinciaVM, ProvinciaExpandedDTO>()
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_provincia))
                 .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
                 ;

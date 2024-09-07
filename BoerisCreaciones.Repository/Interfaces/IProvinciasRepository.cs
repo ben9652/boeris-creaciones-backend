@@ -1,4 +1,4 @@
-﻿using BoerisCreaciones.Core.Models;
+﻿using BoerisCreaciones.Core.Models.Provincias;
 
 namespace BoerisCreaciones.Repository.Interfaces
 {
