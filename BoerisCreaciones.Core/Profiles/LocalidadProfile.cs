@@ -9,7 +9,7 @@ namespace BoerisCreaciones.Core.Profiles
         public LocalidadVMtoDTOProfile()
         {
             CreateMap<LocalidadVM, LocalidadDTO>()
-                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_provincia))
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_localidad))
                 .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
                 .ForMember(dest => dest.province, opt => opt.MapFrom(src => new ProvinciaDTO(src.id_provincia, src.provincia)))
                 ;
@@ -21,7 +21,7 @@ namespace BoerisCreaciones.Core.Profiles
         public LocalidadVMtoExpandedDTOProfile()
         {
             CreateMap<LocalidadVM, LocalidadExpandedDTO>()
-                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_provincia))
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_localidad))
                 .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
                 ;
         }
