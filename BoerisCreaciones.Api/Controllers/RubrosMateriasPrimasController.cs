@@ -45,11 +45,11 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        public ActionResult<RubroMateriaPrimaDTO> CreateRawMaterialCategory(string name)
+        public ActionResult<RubroMateriaPrimaDTO> CreateRawMaterialCategory(RubroMateriaPrimaDTO rubro)
         {
             try
             {
-                _service.CreateRawMaterialCategory(name);
+                _service.CreateRawMaterialCategory(rubro.name);
             }
             catch(Exception ex)
             {
