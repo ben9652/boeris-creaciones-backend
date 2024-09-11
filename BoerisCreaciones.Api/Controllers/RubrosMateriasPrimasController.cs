@@ -49,7 +49,7 @@ namespace BoerisCreaciones.Api.Controllers
         {
             try
             {
-                _service.CreateRawMaterialCategory(rubro.name);
+                rubro = _service.CreateRawMaterialCategory(rubro.name);
             }
             catch(Exception ex)
             {
@@ -57,7 +57,7 @@ namespace BoerisCreaciones.Api.Controllers
                 return BadRequest(ex.Message);
             }
 
-            return NoContent();
+            return Ok(rubro);
         }
 
         [HttpPatch("{id}")]

@@ -2,11 +2,6 @@
 using BoerisCreaciones.Core.Models.Rubros;
 using BoerisCreaciones.Repository.Interfaces;
 using BoerisCreaciones.Service.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BoerisCreaciones.Service.Services
 {
@@ -36,10 +31,11 @@ namespace BoerisCreaciones.Service.Services
             return _mapper.Map<RubroMateriaPrimaDTO>(_repository.GetRawMaterialsCategory(id));
         }
 
-        public void CreateRawMaterialCategory(string category)
+        public RubroMateriaPrimaDTO CreateRawMaterialCategory(string category)
         {
             category = char.ToUpper(category[0]) + category.Substring(1);
-            _repository.CreateRawMaterialCategory(category);
+            RubroMateriaPrimaVM rubro = _repository.CreateRawMaterialCategory(category);
+            return _mapper.Map<RubroMateriaPrimaDTO>(rubro);
         }
 
         public void ModifyRawMaterialCategory(RubroMateriaPrimaDTO category, List<string> attributesToChange)
