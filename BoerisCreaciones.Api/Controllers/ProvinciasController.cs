@@ -42,6 +42,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpGet("Expanded")]
+#if RELEASE
+        [Authorize(Roles = "a")]
+#endif
         public ActionResult GetAllProvincesFull()
         {
             List<ProvinciaExpandedDTO> provincias = new List<ProvinciaExpandedDTO>();

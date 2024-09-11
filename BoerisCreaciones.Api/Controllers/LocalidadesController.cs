@@ -41,6 +41,27 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(provincias);
         }
 
+        [HttpGet("Expanded")]
+#if RELEASE
+        [Authorize(Roles = "a")]
+#endif
+        public ActionResult GetAllFull()
+        {
+            List<LocalidadExpandedDTO> localidades = new List<LocalidadExpandedDTO>();
+
+            try
+            {
+                localidades = _service.GetAllLocalitiesWithBranches();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return NotFound(ex.Message);
+            }
+
+            return Ok(localidades);
+        }
+
         [HttpPost]
 #if RELEASE
         [Authorize(Roles = "a,sa")]
