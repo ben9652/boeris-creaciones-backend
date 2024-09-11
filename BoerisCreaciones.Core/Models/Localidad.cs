@@ -1,4 +1,5 @@
 ﻿using BoerisCreaciones.Core.Models.Provincias;
+using BoerisCreaciones.Core.Models.Sucursales;
 
 namespace BoerisCreaciones.Core.Models.Localidades
 {
@@ -34,12 +35,17 @@ namespace BoerisCreaciones.Core.Models.Localidades
 
     public class LocalidadExpandedDTO : LocalidadDTOBase
     {
-        public LocalidadExpandedDTO() { }
+        public LocalidadExpandedDTO()
+        {
+            branches = new List<SucursalExpandedDTO>();
+        }
 
         public LocalidadExpandedDTO(int id, string name) : base(id, name)
         {
-
+            branches = new List<SucursalExpandedDTO>();
         }
+
+        public List<SucursalExpandedDTO> branches { get; set; }
     }
 
     public class LocalidadDTOBase
