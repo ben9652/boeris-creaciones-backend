@@ -73,8 +73,10 @@ namespace BoerisCreaciones.Repository.Repositories
             return rubroMP;
         }
 
-        public void CreateRawMaterialCategory(string category)
+        public RubroMateriaPrimaVM CreateRawMaterialCategory(string category)
         {
+            RubroMateriaPrimaVM rubro = null;
+
             using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 conn.Open();
@@ -101,8 +103,23 @@ namespace BoerisCreaciones.Repository.Repositories
 
                 cmd.ExecuteNonQuery();
 
+                queryString = "SELECT * FROM RubrosMP WHERE id_rubroMP = LAST_INSERT_ID()";
+                cmd = new MySqlCommand(queryString, conn);
+                reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    rubro = new RubroMateriaPrimaVM(
+                        Convert.ToInt32(reader["id_rubroMP"]),
+                        reader["nombre"].ToString()
+                    );
+                }
+                else
+
                 conn.Close();
             }
+
+            return rubro;
         }
 
         public void ModifyRawMaterialCategory(RubroMateriaPrimaVM category, List<string> attributesToChange)
