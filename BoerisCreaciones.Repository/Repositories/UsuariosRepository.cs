@@ -1,4 +1,5 @@
 ﻿using BoerisCreaciones.Core;
+using BoerisCreaciones.Core.Helpers;
 using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Repository.Interfaces;
 using MySql.Data.MySqlClient;
@@ -147,37 +148,45 @@ namespace BoerisCreaciones.Repository.Repositories
                 .ExecuteVoidStoredProcedure();
         }
 
-        public void UpdateUser(UsuarioVM userObj, List<string> attributesToChange)
+        public void UpdateUser(int id, List<PatchUpdate> attributesToChange)
         {
             using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 conn.Open();
 
-                string queryString = "SELECT * FROM V_MostrarUsuarios WHERE username = @username";
+                PatchUpdate? attr;
+                if((attr = attributesToChange.Find(attr => attr.path == "username")) != null)
+                {
+                    string queryString = "SELECT * FROM V_MostrarUsuarios WHERE username = @username";
 
-                MySqlCommand cmd = new MySqlCommand(queryString, conn);
-                cmd.Parameters.AddWithValue("@username", userObj.username);
-                cmd.Prepare();
+                    MySqlCommand cmd = new MySqlCommand(queryString, conn);
+                    cmd.Parameters.AddWithValue("@username", attr.value);
+                    cmd.Prepare();
 
-                DbDataReader reader = cmd.ExecuteReader();
+                    DbDataReader reader = cmd.ExecuteReader();
 
-                if (reader.Read() && attributesToChange.Find(attr => attr == "username") != null)
-                    throw new DuplicateNameException("El nombre de usuario ya existe");
+                    if (reader.Read())
+                        throw new DuplicateNameException("El nombre de usuario ya existe");
+
+                    reader.Close();
+                }
+
+                string updateString = "UPDATE Usuarios SET ";
+                for(int i = 0; i < attributesToChange.Count; i++)
+                {
+                    updateString += attributesToChange[i].path + " = " + $"@{attributesToChange[i].path}";
+                    if (i != attributesToChange.Count - 1)
+                        updateString += ", ";
+                }
+                updateString += $" WHERE id_usuario = {id}";
+
+                MySqlCommand cmdForUpdate = new MySqlCommand(updateString, conn);
+                for (int i = 0; i < attributesToChange.Count; i++)
+                    cmdForUpdate.Parameters.AddWithValue($"@{attributesToChange[i].path}", attributesToChange[i].value);
+                cmdForUpdate.Prepare();
+
+                cmdForUpdate.ExecuteNonQuery();
             }
-
-            ctx.LoadStoredProcedure("ActualizarUsuario", _connectionStringProvider)
-                    .WithSqlParam("p_id_usuario", userObj.id_usuario)
-                    .WithSqlParam("p_nombre", userObj.nombre)
-                    .WithSqlParam("p_email", userObj.email)
-                    .WithSqlParam("p_username", userObj.username)
-                    .WithSqlParam("p_password", userObj.password)
-                    .WithSqlParam("p_fecha_alta", userObj.fecha_alta)
-                    .WithSqlParam("p_rol", userObj.rol)
-                    .WithSqlParam("p_estado", userObj.estado)
-                    .WithSqlParam("p_domicilio", userObj.domicilio)
-                    .WithSqlParam("p_telefono", userObj.telefono)
-                    .WithSqlParam("p_observaciones", userObj.observaciones)
-                    .ExecuteVoidStoredProcedure();
         }
 
         public void DeleteUser(int id)

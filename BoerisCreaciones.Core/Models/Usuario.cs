@@ -97,6 +97,42 @@ namespace BoerisCreaciones.Core.Models
         public char role { get; set; }
     }
 
+    public class UsuarioDTOComplete : UsuarioDTO
+    {
+        public UsuarioDTOComplete()
+        {
+
+        }
+
+        public UsuarioDTOComplete(
+            int id_user,
+            string username,
+            string password,
+            string? lastName,
+            string firstName,
+            string email,
+            char role,
+            char state,
+            string? domicile,
+            UInt64? phone,
+            string? observations
+            )
+            : base(id_user, username, lastName, firstName, email, role)
+        {
+            this.password = password;
+            this.state = state;
+            this.domicile = domicile;
+            this.phone = phone;
+            this.observations = observations;
+        }
+
+        public string password { get; set; }
+        public char state { get; set; }
+        public string? domicile { get; set; }
+        public UInt64? phone { get; set; }
+        public string? observations { get; set; }
+    }
+
     public class UsuarioLogin
     {
         public UsuarioLogin()

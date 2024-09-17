@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BoerisCreaciones.Core.Helpers;
 using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -133,39 +134,52 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,s")]
 #endif
-        public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioVM> patchDoc)
+        public ActionResult UpdateUser(int id, JsonPatchDocument<UsuarioDTOComplete> patchDoc)
         {
-            if (!IsUserAuthenticated(id))
-                return BadRequest();
+#if RELEASE
+            try
+            {
+                IsUserAuthenticated(id);
+            }
+            catch(Exception ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+#endif
+
+            if (patchDoc.Operations.Count == 0)
+                return BadRequest("No se hizo solicitud de ninguna modificación de atributos");
+
+            if (patchDoc.Operations.Find(op => op.path == "id_usuario") != null)
+                return BadRequest("No puede modificarse el ID");
 
             UsuarioVM user = _service.GetUserById(id);
             if (user == null)
                 return NotFound(new MensajeSolicitud("No existe el usuario", true));
 
-            patchDoc.ApplyTo(user, ModelState);
+            UsuarioDTOComplete userDTO = _mapper.Map<UsuarioDTOComplete>(user);
+
+            patchDoc.ApplyTo(userDTO, ModelState);
             if (!TryValidateModel(user))
                 return ValidationProblem(ModelState);
 
-            if (patchDoc.Operations.Count == 0)
-                return NoContent();
-
-            List<string> attributes = new();
-            foreach(Operation<UsuarioVM> ops in patchDoc.Operations)
-                attributes.Add(ops.path);
+            List<PatchUpdate> attributes = new();
+            foreach(Operation<UsuarioDTOComplete> ops in patchDoc.Operations)
+                attributes.Add(new PatchUpdate(ops.path, ops.value));
 
             try
             {
-                _service.UpdateUser(user, attributes);
+                _service.UpdateUser(id, userDTO, attributes);
             }
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return Ok(new MensajeSolicitud(ex.Message, true));
+                return NotFound(ex.Message);
             }
 
             UsuarioDTO userClient= _mapper.Map<UsuarioDTO>(user);
 
-            return Ok(new MensajeSolicitud(userClient, false));
+            return Ok(userClient);
         }
 
         [HttpDelete("{id}")]
@@ -186,6 +200,9 @@ namespace BoerisCreaciones.Api.Controllers
         private bool IsUserAuthenticated(int id)
         {
             var claimsOfUser = HttpContext.User.Identities.First().Claims;
+            int claimsNumber = claimsOfUser.Count();
+            if (claimsNumber == 0)
+                throw new Exception("El usuario no está autenticado");
             string serialNumber = claimsOfUser.First().Value;
             return id == Convert.ToInt32(serialNumber);
         }

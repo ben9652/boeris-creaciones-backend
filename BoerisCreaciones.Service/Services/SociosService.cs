@@ -17,7 +17,7 @@ namespace BoerisCreaciones.Service.Services
         private readonly IMapper _mapper;
 
         public SociosService(IUsuariosRepository usuariosRepository, ISociosRepository sociosRepository, IRolesSociosService rolesService, IConfiguration configuration, IMapper mapper)
-            : base(usuariosRepository, configuration)
+            : base(usuariosRepository, configuration, mapper)
         {
             _repository = sociosRepository;
             _rolesService = rolesService;
