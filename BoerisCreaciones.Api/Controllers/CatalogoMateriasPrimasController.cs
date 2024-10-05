@@ -70,6 +70,9 @@ namespace BoerisCreaciones.Api.Controllers
         }
 
         [HttpPost("upload-image")]
+#if RELEASE
+        [Authorize(Roles = "a,sa")]
+#endif
         public async Task<IActionResult> UploadImage([FromForm] IFormFile picture)
         {
             if (picture == null || picture.Length == 0)
