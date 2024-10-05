@@ -1,9 +1,11 @@
 ﻿using BoerisCreaciones.Core.Models.Productos;
 using BoerisCreaciones.Service.Interfaces;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -13,11 +15,13 @@ namespace BoerisCreaciones.Api.Controllers
     {
         private readonly ILogger<CatalogoProductosController> _logger;
         private readonly ICatalogoProductosService _service;
+        private readonly IWebHostEnvironment _env;
 
-        public CatalogoProductosController(ILogger<CatalogoProductosController> logger, ICatalogoProductosService service)
+        public CatalogoProductosController(ILogger<CatalogoProductosController> logger, ICatalogoProductosService service, IWebHostEnvironment env)
         {
             _logger = logger;
             _service = service;
+            _env = env;
         }
 
         [HttpGet]
@@ -79,6 +83,66 @@ namespace BoerisCreaciones.Api.Controllers
             }
 
             return Ok(item);
+        }
+
+        [HttpPost("upload-image")]
+        public async Task<IActionResult> UploadImage([FromForm] IFormFile picture)
+        {
+            if (picture == null || picture.Length == 0)
+            {
+                return BadRequest("No se proporcionó una imagen válida.");
+            }
+
+            var webRootPath = _env.WebRootPath;
+            if (string.IsNullOrEmpty(webRootPath))
+            {
+                webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            }
+
+            string controllerName = "CatalogoProductos";
+
+            // Combinar ruta
+            var uploadsPath = Path.Combine(webRootPath, controllerName);
+            if (!Directory.Exists(uploadsPath))
+            {
+                Directory.CreateDirectory(uploadsPath);
+            }
+
+            string url;
+
+            try
+            {
+                // Generar un nombre único para la imagen
+                string? extension = Path.GetExtension(picture.FileName);
+                var fileName = Guid.NewGuid().ToString() + extension;
+
+                // Ruta para guardar la imagen en el servidor
+                var filePath = Path.Combine(uploadsPath, fileName);
+
+                // Cargar la imagen y procesarla (redimensionar y comprimir)
+                using (var image = Image.Load(picture.OpenReadStream()))
+                {
+                    // Redimensionar la imagen si es necesario
+                    image.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(500, 500)  // Tamaño máximo de 800x800
+                    }));
+
+                    // Guardar la imagen comprimida con calidad del 70%
+                    await image.SaveAsync(filePath, new JpegEncoder { Quality = 70 });
+                }
+
+                // Devolver la URL o la ruta del archivo guardado
+                url = $"{Request.Scheme}://{Request.Host}/{controllerName}/{fileName}";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+
+            return Ok(new { url });
         }
 
         [HttpPatch("{id}")]
