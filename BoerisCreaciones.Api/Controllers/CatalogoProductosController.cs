@@ -1,11 +1,10 @@
 ﻿using BoerisCreaciones.Core.Models.Productos;
+using BoerisCreaciones.Service.Helpers;
 using BoerisCreaciones.Service.Interfaces;
-using DotNetEnv;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
-using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -89,52 +88,16 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        public async Task<IActionResult> UploadImage([FromForm] IFormFile picture)
+        public async Task<IActionResult> UploadImage()
         {
-            if (picture == null || picture.Length == 0)
-            {
-                return BadRequest("No se proporcionó una imagen válida.");
-            }
-
-            var webRootPath = _env.WebRootPath;
-            if (string.IsNullOrEmpty(webRootPath))
-            {
-                webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            }
-
-            string controllerName = "CatalogoProductos";
-
-            // Combinar ruta
-            var uploadsPath = Path.Combine(webRootPath, controllerName);
-            if (!Directory.Exists(uploadsPath))
-            {
-                Directory.CreateDirectory(uploadsPath);
-            }
+            IFormFileCollection files = Request.Form.Files;
 
             string url;
+            string controllerName = "CatalogoProductos";
 
             try
             {
-                // Generar un nombre único para la imagen
-                string? extension = Path.GetExtension(picture.FileName);
-                var fileName = Guid.NewGuid().ToString() + extension;
-
-                // Ruta para guardar la imagen en el servidor
-                var filePath = Path.Combine(uploadsPath, fileName);
-
-                // Cargar la imagen y procesarla (redimensionar y comprimir)
-                using (var image = Image.Load(picture.OpenReadStream()))
-                {
-                    // Redimensionar la imagen si es necesario
-                    image.Mutate(x => x.Resize(new ResizeOptions
-                    {
-                        Mode = ResizeMode.Max,
-                        Size = new Size(500, 500)  // Tamaño máximo de 800x800
-                    }));
-
-                    // Guardar la imagen comprimida con calidad del 70%
-                    await image.SaveAsync(filePath, new JpegEncoder { Quality = 70 });
-                }
+                string fileName = await MultimediaManging.UploadImage(files[0], _env.WebRootPath, controllerName);
 
                 // Devolver la URL o la ruta del archivo guardado
                 url = $"{Request.Scheme}://{Request.Host}/{controllerName}/{fileName}";
@@ -145,7 +108,20 @@ namespace BoerisCreaciones.Api.Controllers
                 return BadRequest(ex.Message);
             }
 
-            return Ok(new { url });
+            return Ok(url);
+        }
+
+        [HttpDelete("delete-image/{imagePath}")]
+#if RELEASE
+        [Authorize(Roles = "a,sa")]
+#endif
+        public IActionResult DeleteImage(string imagePath)
+        {
+            string controllerName = "CatalogoProductos";
+
+            bool result = MultimediaManging.DeleteImage(imagePath, _env.WebRootPath, controllerName);
+
+            return Ok(result);
         }
 
         [HttpPatch("{id}")]
