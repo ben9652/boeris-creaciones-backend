@@ -1,4 +1,5 @@
 ﻿using BoerisCreaciones.Core.Models.Productos;
+using BoerisCreaciones.Service.Helpers;
 using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -13,11 +14,13 @@ namespace BoerisCreaciones.Api.Controllers
     {
         private readonly ILogger<CatalogoProductosController> _logger;
         private readonly ICatalogoProductosService _service;
+        private readonly IWebHostEnvironment _env;
 
-        public CatalogoProductosController(ILogger<CatalogoProductosController> logger, ICatalogoProductosService service)
+        public CatalogoProductosController(ILogger<CatalogoProductosController> logger, ICatalogoProductosService service, IWebHostEnvironment env)
         {
             _logger = logger;
             _service = service;
+            _env = env;
         }
 
         [HttpGet]
@@ -79,6 +82,46 @@ namespace BoerisCreaciones.Api.Controllers
             }
 
             return Ok(item);
+        }
+
+        [HttpPost("upload-image")]
+#if RELEASE
+        [Authorize(Roles = "a,sa")]
+#endif
+        public async Task<IActionResult> UploadImage()
+        {
+            IFormFileCollection files = Request.Form.Files;
+
+            string url;
+            string controllerName = "CatalogoProductos";
+
+            try
+            {
+                string fileName = await MultimediaManging.UploadImage(files[0], _env.WebRootPath, controllerName);
+
+                // Devolver la URL o la ruta del archivo guardado
+                url = $"{Request.Scheme}://{Request.Host}/{controllerName}/{fileName}";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+
+            return Ok(url);
+        }
+
+        [HttpDelete("delete-image/{imagePath}")]
+#if RELEASE
+        [Authorize(Roles = "a,sa")]
+#endif
+        public IActionResult DeleteImage(string imagePath)
+        {
+            string controllerName = "CatalogoProductos";
+
+            bool result = MultimediaManging.DeleteImage(imagePath, _env.WebRootPath, controllerName);
+
+            return Ok(result);
         }
 
         [HttpPatch("{id}")]

@@ -2,6 +2,7 @@
 **/obj/
 **/bin/
 /BoerisCreaciones.Api/.env
+/BoerisCreaciones.Api/wwwroot
 /BoerisCreaciones.Api/publish
 /BoerisCreaciones.Api/bin
 /BoerisCreaciones.Api/obj/

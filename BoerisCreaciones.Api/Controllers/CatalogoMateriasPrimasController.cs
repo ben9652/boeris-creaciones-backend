@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Policy;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
+using BoerisCreaciones.Service.Helpers;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -13,11 +17,19 @@ namespace BoerisCreaciones.Api.Controllers
     {
         private readonly ICatalogoMateriasPrimasService _service;
         private readonly ILogger<CatalogoMateriasPrimasController> _logger;
+        private readonly IWebHostEnvironment _env;
 
-        public CatalogoMateriasPrimasController(ICatalogoMateriasPrimasService service, ILogger<CatalogoMateriasPrimasController> logger)
+        public CatalogoMateriasPrimasController(ICatalogoMateriasPrimasService service, ILogger<CatalogoMateriasPrimasController> logger, IWebHostEnvironment env)
         {
             _service = service;
             _logger = logger;
+            _env = env;
+
+            var webRootPath = _env.WebRootPath;
+            if (string.IsNullOrEmpty(webRootPath))
+            {
+                webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            }
         }
 
         [HttpGet]
@@ -62,6 +74,46 @@ namespace BoerisCreaciones.Api.Controllers
             }
 
             return Ok(itemMateriaPrima);
+        }
+
+        [HttpPost("upload-image")]
+#if RELEASE
+        [Authorize(Roles = "a,sa")]
+#endif
+        public async Task<IActionResult> UploadImage()
+        {
+            IFormFileCollection files = Request.Form.Files;
+
+            string url;
+            string controllerName = "CatalogoMateriasPrimas";
+
+            try
+            {
+                string fileName = await MultimediaManging.UploadImage(files[0], _env.WebRootPath, controllerName);
+
+                // Devolver la URL o la ruta del archivo guardado
+                url = $"{Request.Scheme}://{Request.Host}/{controllerName}/{fileName}";
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+
+            return Ok(url);
+        }
+
+        [HttpDelete("delete-image/{imagePath}")]
+#if RELEASE
+        [Authorize(Roles = "a,sa")]
+#endif
+        public IActionResult DeleteImage(string imagePath)
+        {
+            string controllerName = "CatalogoMateriasPrimas";
+
+            bool result = MultimediaManging.DeleteImage(imagePath, _env.WebRootPath, controllerName);
+
+            return Ok(result);
         }
 
         [HttpPatch("{id}")]
