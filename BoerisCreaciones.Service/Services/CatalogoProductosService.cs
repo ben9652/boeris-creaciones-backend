@@ -48,8 +48,11 @@ namespace BoerisCreaciones.Service.Services
         {
             ProductosItemVM productoDB = _mapper.Map<ProductosItemVM>(item);
             productoDB = _repository.UpdateProductItem(productoDB, attributesToChange);
-            productoDB.rubro = productoDB.nombre;
-            _repositoryRubrosP.ModifyProductsCategory(new RubroProductoVM(productoDB.id_rubroP, productoDB.rubro), new List<string> { "nombre" });
+            if (attributesToChange.Find(str => str == "name") != null)
+            {
+                productoDB.rubro = productoDB.nombre;
+                _repositoryRubrosP.ModifyProductsCategory(new RubroProductoVM(productoDB.id_rubroP, productoDB.rubro), new List<string> { "nombre" });
+            }
             return _mapper.Map<ProductosItemDTO>(productoDB);
         }
 
