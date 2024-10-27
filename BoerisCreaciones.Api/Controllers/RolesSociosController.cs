@@ -35,6 +35,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
+                return NotFound(new { ex.Message });
             }
 
             return Ok(roles);
@@ -54,7 +55,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(roles);
@@ -73,6 +74,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return NoContent();
@@ -91,6 +93,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return NoContent();
@@ -109,6 +112,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return NoContent();

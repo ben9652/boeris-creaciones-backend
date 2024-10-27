@@ -47,7 +47,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(catalogoMateriasPrimas);
@@ -61,7 +61,7 @@ namespace BoerisCreaciones.Api.Controllers
         {
             char origen = itemMateriaPrima.source;
             if (origen != 'C' && origen != 'E' && origen != 'P')
-                return BadRequest("El valor del origen es inválido");
+                return BadRequest(new { Message = "El valor del origen es inválido" });
 
             try
             {
@@ -70,7 +70,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(itemMateriaPrima);
@@ -97,7 +97,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(url);
@@ -144,7 +144,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(item);
@@ -163,7 +163,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return StatusCode(412, ex.Message);
+                return StatusCode(412, new { ex.Message });
             }
 
             return NoContent();

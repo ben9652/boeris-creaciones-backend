@@ -26,12 +26,12 @@ namespace BoerisCreaciones.Core.Models.Sucursales
     {
         public SucursalDTO() { }
 
-        public SucursalDTO(int id, string name, string domicile, LocalidadDTOBase locality) : base(id, name, domicile)
+        public SucursalDTO(int id, string name, string domicile, LocalidadDTO locality) : base(id, name, domicile)
         {
             this.locality = locality;
         }
 
-        public LocalidadDTOBase locality { get; set; }
+        public LocalidadDTO locality { get; set; }
     }
 
     public class SucursalExpandedDTO : SucursalDTOBase

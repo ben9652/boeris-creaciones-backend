@@ -38,7 +38,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return NotFound(ex.Message);
+                return NotFound(new { ex.Message });
             }
 
             return Ok(productos);
@@ -59,7 +59,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return NotFound(ex.Message);
+                return NotFound(new { ex.Message });
             }
 
             return Ok(producto);
@@ -78,7 +78,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return NotFound(ex.Message);
+                return NotFound(new { ex.Message });
             }
 
             return Ok(item);
@@ -105,7 +105,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(url);
@@ -152,7 +152,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(item);
@@ -171,7 +171,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return StatusCode(412, ex.Message);
+                return StatusCode(412, new { ex.Message });
             }
 
             return NoContent();

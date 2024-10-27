@@ -12,7 +12,7 @@ namespace BoerisCreaciones.Core.Profiles
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_sucursal))
                 .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
                 .ForMember(dest => dest.domicile, opt => opt.MapFrom(src => src.domicilio))
-                .ForMember(dest => dest.locality, opt => opt.MapFrom(src => new LocalidadDTOBase(src.id_localidad, src.localidad)))
+                .ForMember(dest => dest.locality, opt => opt.MapFrom(src => new LocalidadDTO(src.id_localidad, src.localidad, null)))
                 ;
         }
     }

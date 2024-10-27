@@ -36,6 +36,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
+                return NotFound(new { ex.Message });
             }
 
             return Ok(partners);
@@ -58,7 +59,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return StatusCode(412, new MensajeSolicitud(ex.Message, true));
+                return StatusCode(412, new { ex.Message });
             }
 
             return Ok(partner);
@@ -77,7 +78,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return StatusCode(412, new MensajeSolicitud(ex.Message, true));
+                return StatusCode(412, new { ex.Message });
             }
 
             return NoContent();

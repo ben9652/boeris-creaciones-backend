@@ -35,7 +35,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(rubros);
@@ -54,7 +54,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(rubro);
@@ -88,7 +88,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
             return Ok(category);
@@ -107,12 +107,12 @@ namespace BoerisCreaciones.Api.Controllers
             catch(MySqlException ex)
             {
                 _logger.LogError(ex.Message);
-                return StatusCode(412, "El rubro que se quiere eliminar está siendo utilizado por una materia prima");
+                return StatusCode(412, new { Message = "El rubro que se quiere eliminar está siendo utilizado por una materia prima" });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return StatusCode(412, ex.Message);
+                return StatusCode(412, new { ex.Message });
             }
 
             return NoContent();

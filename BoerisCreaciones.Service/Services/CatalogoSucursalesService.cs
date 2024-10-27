@@ -8,12 +8,14 @@ namespace BoerisCreaciones.Service.Services
     public class CatalogoSucursalesService : ICatalogoSucursalesService
     {
         private readonly ICatalogoSucursalesRepository _repository;
+        private readonly ILocalidadesService _localidadesService;
         private readonly IMapper _mapper;
 
-        public CatalogoSucursalesService(ICatalogoSucursalesRepository repository, IMapper mapper)
+        public CatalogoSucursalesService(ICatalogoSucursalesRepository repository, IMapper mapper, ILocalidadesService localidadesService)
         {
             _repository = repository;
             _mapper = mapper;
+            _localidadesService = localidadesService;
         }
 
         public List<SucursalDTO> GetAll()
@@ -21,7 +23,11 @@ namespace BoerisCreaciones.Service.Services
             List<SucursalVM> sucursalesBD = _repository.GetAll();
             List<SucursalDTO> sucursales = new List<SucursalDTO>();
             foreach(SucursalVM sucursalBD in sucursalesBD)
-                sucursales.Add(_mapper.Map<SucursalDTO>(sucursalBD));
+            {
+                SucursalDTO sucursalDTO = _mapper.Map<SucursalDTO>(sucursalBD);
+                sucursalDTO.locality = _localidadesService.GetById(sucursalDTO.locality.id);
+                sucursales.Add(sucursalDTO);
+            }
 
             return sucursales;
         }
