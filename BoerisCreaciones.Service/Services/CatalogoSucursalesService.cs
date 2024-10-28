@@ -35,22 +35,33 @@ namespace BoerisCreaciones.Service.Services
         public SucursalDTO GetById(int id)
         {
             SucursalVM sucursalBD = _repository.GetById(id);
-            SucursalDTO sucursal = _mapper.Map<SucursalDTO>(sucursalBD);
-            return sucursal;
+
+            SucursalDTO sucursalDTO = _mapper.Map<SucursalDTO>(sucursalBD);
+            sucursalDTO.locality = _localidadesService.GetById(sucursalDTO.locality.id);
+
+            return sucursalDTO;
         }
 
         public SucursalDTO Create(SucursalDTO sucursal)
         {
             SucursalVM sucursalBD = _mapper.Map<SucursalVM>(sucursal);
             sucursalBD = _repository.Create(sucursalBD);
-            return _mapper.Map<SucursalDTO>(sucursalBD);
+
+            SucursalDTO sucursalDTO = _mapper.Map<SucursalDTO>(sucursalBD);
+            sucursalDTO.locality = _localidadesService.GetById(sucursalDTO.locality.id);
+
+            return sucursalDTO;
         }
 
         public SucursalDTO Update(SucursalDTO sucursal, List<string> attributes)
         {
             SucursalVM sucursalBD = _mapper.Map<SucursalVM>(sucursal);
             sucursalBD = _repository.Update(sucursalBD, attributes);
-            return _mapper.Map<SucursalDTO>(sucursalBD);
+            
+            SucursalDTO sucursalDTO = _mapper.Map<SucursalDTO>(sucursalBD);
+            sucursalDTO.locality = _localidadesService.GetById(sucursalDTO.locality.id);
+
+            return sucursalDTO;
         }
 
         public void Delete(int id)

@@ -127,7 +127,7 @@ namespace BoerisCreaciones.Repository.Repositories
 
         public SucursalVM Update(SucursalVM sucursal, List<string> attributes)
         {
-            return _ctx.LoadStoredProcedure("ActualizarLocalidad", _connection)
+            return _ctx.LoadStoredProcedure("ActualizarSucursal", _connection)
                 .WithSqlParam("p_id", sucursal.id_sucursal)
                 .WithSqlParam("p_id_localidad", sucursal.id_localidad)
                 .WithSqlParam("p_nombre", sucursal.nombre)
