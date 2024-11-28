@@ -27,9 +27,9 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        public ActionResult<List<ProductosItemDTO>> GetAllProducts()
+        public ActionResult<List<ProductoDTO>> GetAllProducts()
         {
-            List<ProductosItemDTO> productos = new List<ProductosItemDTO>();
+            List<ProductoDTO> productos = new List<ProductoDTO>();
 
             try
             {
@@ -48,9 +48,9 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        public ActionResult<ProductosItemDTO> GetProductById(int id)
+        public ActionResult<ProductoDTO> GetProductById(int id)
         {
-            ProductosItemDTO producto = null;
+            ProductoDTO producto = null;
 
             try
             {
@@ -69,7 +69,7 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        public ActionResult<ProductosItemDTO> CreateProduct(ProductosItemDTO item)
+        public ActionResult<ProductoDTO> CreateProduct(ProductoDTO item)
         {
             try
             {
@@ -128,9 +128,9 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        public ActionResult UpdateProduct(int id, JsonPatchDocument<ProductosItemDTO> patchDoc)
+        public ActionResult UpdateProduct(int id, JsonPatchDocument<ProductoDTO> patchDoc)
         {
-            ProductosItemDTO item = _service.GetProductsItem(id);
+            ProductoDTO item = _service.GetProductsItem(id);
             if (item == null)
                 return NotFound("No existe el producto especificado");
 
@@ -142,7 +142,7 @@ namespace BoerisCreaciones.Api.Controllers
                 return NoContent();
 
             List<string> attributes = new();
-            foreach (Operation<ProductosItemDTO> ops in patchDoc.Operations)
+            foreach (Operation<ProductoDTO> ops in patchDoc.Operations)
                 attributes.Add(ops.path);
 
             try

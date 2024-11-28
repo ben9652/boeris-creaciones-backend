@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BoerisCreaciones.Core.Models.Localidades;
+using BoerisCreaciones.Core.Models.PrimeNG.Dropdown;
 using BoerisCreaciones.Core.Models.Sucursales;
 using BoerisCreaciones.Repository.Interfaces;
 using BoerisCreaciones.Service.Interfaces;
@@ -40,6 +42,35 @@ namespace BoerisCreaciones.Service.Services
             sucursalDTO.locality = _localidadesService.GetById(sucursalDTO.locality.id);
 
             return sucursalDTO;
+        }
+
+        public List<SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>> GetGroupedDropdown()
+        {
+            List<SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>> groupedDropdown = new();
+
+            List<SucursalVM> sucursalesBD = _repository.GetAll();
+
+            sucursalesBD = sucursalesBD.OrderBy(sucursal => sucursal.id_localidad).ToList();
+
+            LocalidadDTOBase localidad = new LocalidadDTOBase(sucursalesBD[0].id_localidad, sucursalesBD[0].localidad);
+            List<SelectItem<SucursalDTOBase>> group = new();
+            foreach(SucursalVM sucursal in sucursalesBD)
+            {
+                if(sucursal.id_localidad != localidad.id)
+                {
+                    List<SelectItem<SucursalDTOBase>> newGroup = new(group);
+                    groupedDropdown.Add(new SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>(localidad.name, localidad, newGroup));
+                    localidad = new LocalidadDTOBase(sucursal.id_localidad, sucursal.localidad);
+                    group.Clear();
+                }
+
+                SucursalDTOBase sucursalDTO = _mapper.Map<SucursalDTOBase>(sucursal);
+                group.Add(new SelectItem<SucursalDTOBase>(sucursalDTO.name, sucursalDTO));
+            }
+
+            groupedDropdown.Add(new SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>(localidad.name, localidad, group));
+
+            return groupedDropdown;
         }
 
         public SucursalDTO Create(SucursalDTO sucursal)

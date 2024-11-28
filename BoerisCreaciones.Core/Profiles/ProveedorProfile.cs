@@ -19,6 +19,20 @@ namespace BoerisCreaciones.Core.Profiles
         }
     }
 
+    public class ProveedorProfileVMtoDTOBase : Profile
+    {
+        public ProveedorProfileVMtoDTOBase()
+        {
+            CreateMap<ProveedorVM, ProveedorDTOBase>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id))
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
+                .ForMember(dest => dest.residence, opt => opt.MapFrom(src => src.domicilio))
+                .ForMember(dest => dest.phone, opt => opt.MapFrom(src => src.telefono))
+                .ForMember(dest => dest.cvu_or_alias, opt => opt.MapFrom(src => src.cvu != null && src.cvu.Length != 0 ? src.cvu : src.alias))
+                ;
+        }
+    }
+
     public class ProveedorProfileDTOtoVM : Profile
     {
         public ProveedorProfileDTOtoVM()

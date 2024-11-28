@@ -2,14 +2,14 @@
 
 namespace BoerisCreaciones.Core.Models.Productos
 {
-    public class ProductosItemVM
+    public class ProductoVM
     {
-        public ProductosItemVM()
+        public ProductoVM()
         {
 
         }
 
-        public ProductosItemVM(int id_producto, int id_rubroP, string rubro, string nombre, float precio, int cantidad_restante, int cantidad_descartada, string imagen, string comentario)
+        public ProductoVM(int id_producto, int id_rubroP, string rubro, string nombre, float precio, int cantidad_restante, int cantidad_descartada, string imagen, string comentario)
         {
             this.id_producto = id_producto;
             this.id_rubroP = id_rubroP;
@@ -33,14 +33,14 @@ namespace BoerisCreaciones.Core.Models.Productos
         public string? comentario { get; set; }
     }
 
-    public class ProductosItemDTO
+    public class ProductoDTO
     {
-        public ProductosItemDTO()
+        public ProductoDTO()
         {
 
         }
 
-        public ProductosItemDTO(int id, RubroProductoDTO category, string name, float price, int stock, string picture, string comment)
+        public ProductoDTO(int id, RubroProductoDTO category, string name, float price, int stock, string picture, string comment)
         {
             this.id = id;
             this.category = category;

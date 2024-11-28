@@ -17,6 +17,18 @@ namespace BoerisCreaciones.Core.Profiles
         }
     }
 
+    public class SucursalVMtoDTOBaseProfile : Profile
+    {
+        public SucursalVMtoDTOBaseProfile()
+        {
+            CreateMap<SucursalVM, SucursalDTOBase>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_sucursal))
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
+                .ForMember(dest => dest.domicile, opt => opt.MapFrom(src => src.domicilio))
+                ;
+        }
+    }
+
     public class SucursalVMtoExpandedDTOProfile : Profile
     {
         public SucursalVMtoExpandedDTOProfile()

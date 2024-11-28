@@ -18,9 +18,9 @@ namespace BoerisCreaciones.Repository.Repositories
             _ctx = ctx;
         }
 
-        public List<ProductosItemVM> GetProductsItems()
+        public List<ProductoVM> GetProductsItems()
         {
-            List<ProductosItemVM> productos = new List<ProductosItemVM>();
+            List<ProductoVM> productos = new List<ProductoVM>();
 
             using (MySqlConnection conn = new MySqlConnection(_connectionString.ConnectionString))
             {
@@ -39,7 +39,7 @@ namespace BoerisCreaciones.Repository.Repositories
 
                     double precio = Convert.ToDouble(reader["precio"]);
 
-                    ProductosItemVM producto = new ProductosItemVM(
+                    ProductoVM producto = new ProductoVM(
                         Convert.ToInt32(reader["id_producto"]),
                         Convert.ToInt32(reader["id_rubroP"]),
                         reader["rubro"].ToString(),
@@ -60,9 +60,9 @@ namespace BoerisCreaciones.Repository.Repositories
             return productos;
         }
 
-        public ProductosItemVM GetProductsItem(int id)
+        public ProductoVM GetProductsItem(int id)
         {
-            ProductosItemVM producto;
+            ProductoVM producto;
 
             using (MySqlConnection conn = new MySqlConnection(_connectionString.ConnectionString))
             {
@@ -81,7 +81,7 @@ namespace BoerisCreaciones.Repository.Repositories
 
                     double precio = Convert.ToDouble(reader["precio"]);
 
-                    producto = new ProductosItemVM(
+                    producto = new ProductoVM(
                         Convert.ToInt32(reader["id_producto"]),
                         Convert.ToInt32(reader["id_rubroP"]),
                         reader["rubro"].ToString(),
@@ -102,7 +102,7 @@ namespace BoerisCreaciones.Repository.Repositories
             return producto;
         }
 
-        public ProductosItemVM CreateProductItem(ProductosItemVM item)
+        public ProductoVM CreateProductItem(ProductoVM item)
         {
             return _ctx.LoadStoredProcedure("CrearProducto", _connectionString)
                 .WithSqlParam("p_id_rubro", item.id_rubroP)
@@ -110,10 +110,10 @@ namespace BoerisCreaciones.Repository.Repositories
                 .WithSqlParam("p_precio", item.precio)
                 .WithSqlParam("p_imagen", item.imagen)
                 .WithSqlParam("p_comentario", item.comentario)
-                .ExecuteSingleResultStoredProcedure<ProductosItemVM>();
+                .ExecuteSingleResultStoredProcedure<ProductoVM>();
         }
 
-        public ProductosItemVM UpdateProductItem(ProductosItemVM item, List<string> attributesToChange)
+        public ProductoVM UpdateProductItem(ProductoVM item, List<string> attributesToChange)
         {
             using (MySqlConnection conn = new MySqlConnection(_connectionString.ConnectionString))
             {
@@ -144,7 +144,7 @@ namespace BoerisCreaciones.Repository.Repositories
                 .WithSqlParam("p_precio", item.precio)
                 .WithSqlParam("p_imagen", item.imagen)
                 .WithSqlParam("p_comentario", item.comentario)
-                .ExecuteSingleResultStoredProcedure<ProductosItemVM>();
+                .ExecuteSingleResultStoredProcedure<ProductoVM>();
         }
 
         public void DeleteProductItem(int id)

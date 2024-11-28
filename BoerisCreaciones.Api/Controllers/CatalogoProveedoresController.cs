@@ -1,4 +1,8 @@
-﻿using BoerisCreaciones.Core.Models.Proveedores;
+﻿using BoerisCreaciones.Core.Models.Localidades;
+using BoerisCreaciones.Core.Models.PrimeNG.Dropdown;
+using BoerisCreaciones.Core.Models.Proveedores;
+using BoerisCreaciones.Core.Models.Rubros;
+using BoerisCreaciones.Core.Models.Sucursales;
 using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -60,6 +64,27 @@ namespace BoerisCreaciones.Api.Controllers
             }
 
             return Ok(proveedor);
+        }
+
+        [HttpGet("Dropdown")]
+#if RELEASE
+        [Authorize]
+#endif
+        public ActionResult GetGroupedDropdown()
+        {
+            List<SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTOBase>> dropdownAgrupado = new();
+
+            try
+            {
+                dropdownAgrupado = _service.GetGroupedDropdown();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(new { ex.Message });
+            }
+
+            return Ok(dropdownAgrupado);
         }
 
         [HttpPost]

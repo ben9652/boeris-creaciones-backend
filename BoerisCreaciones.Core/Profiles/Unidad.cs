@@ -3,9 +3,9 @@ using BoerisCreaciones.Core.Models.Unidades;
 
 namespace BoerisCreaciones.Core.Profiles
 {
-    public class UnidadVMtoDTOProfile : Profile
+    public class Unidad : Profile
     {
-        public UnidadVMtoDTOProfile()
+        public Unidad()
         {
             CreateMap<UnidadVM, UnidadDTO>()
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_unidad))
