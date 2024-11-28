@@ -4,10 +4,10 @@ namespace BoerisCreaciones.Service.Interfaces
 {
     public interface ICatalogoProductosService
     {
-        public List<ProductosItemDTO> GetProductsItems();
-        public ProductosItemDTO GetProductsItem(int id);
-        public ProductosItemDTO CreateProductItem(ProductosItemDTO item);
-        public ProductosItemDTO UpdateProductItem(ProductosItemDTO item, List<string> attributesToChange);
+        public List<ProductoDTO> GetProductsItems();
+        public ProductoDTO GetProductsItem(int id);
+        public ProductoDTO CreateProductItem(ProductoDTO item);
+        public ProductoDTO UpdateProductItem(ProductoDTO item, List<string> attributesToChange);
         public void DeleteProductItem(int id);
     }
 }

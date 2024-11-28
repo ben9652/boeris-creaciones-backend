@@ -31,18 +31,17 @@ namespace BoerisCreaciones.Core.Models.Proveedores
         public string? alias { get; set; }
     }
 
-    public class ProveedorDTO
+    public class ProveedorDTOBase
     {
-        public ProveedorDTO()
+        public ProveedorDTOBase()
         {
 
         }
 
-        public ProveedorDTO(int id, string name, RubroMateriaPrimaDTO category, string? residence, long? phone, string? cvu_or_alias)
+        public ProveedorDTOBase(int id, string name, string? residence, long? phone, string? cvu_or_alias)
         {
             this.id = id;
             this.name = name;
-            this.category = category;
             this.residence = residence;
             this.phone = phone;
             this.cvu_or_alias = cvu_or_alias;
@@ -50,9 +49,24 @@ namespace BoerisCreaciones.Core.Models.Proveedores
 
         public int id { get; set; }
         public string name { get; set; }
-        public RubroMateriaPrimaDTO category { get; set; }
         public string? residence { get; set; }
         public long? phone { get; set; }
         public string? cvu_or_alias { get; set; }
+    }
+
+    public class ProveedorDTO : ProveedorDTOBase
+    {
+        public ProveedorDTO()
+        {
+
+        }
+
+        public ProveedorDTO(int id, string name, RubroMateriaPrimaDTO category, string? residence, long? phone, string? cvu_or_alias)
+            : base(id, name, residence, phone, cvu_or_alias)
+        {
+            this.category = category;
+        }
+
+        public RubroMateriaPrimaDTO category { get; set; }
     }
 }

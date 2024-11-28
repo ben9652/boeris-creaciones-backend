@@ -1,13 +1,11 @@
 ﻿using BoerisCreaciones.Core.Models.MateriasPrimas;
 using BoerisCreaciones.Service.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Policy;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Processing;
 using BoerisCreaciones.Service.Helpers;
+using BoerisCreaciones.Core.Models.PrimeNG.Dropdown;
+using BoerisCreaciones.Core.Models.Rubros;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -36,9 +34,9 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        public ActionResult<List<MateriasPrimasItemDTO>> Get()
+        public ActionResult<List<MateriaPrimaDTO>> Get()
         {
-            List<MateriasPrimasItemDTO> catalogoMateriasPrimas = new List<MateriasPrimasItemDTO>();
+            List<MateriaPrimaDTO> catalogoMateriasPrimas = new List<MateriaPrimaDTO>();
 
             try
             {
@@ -53,11 +51,32 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(catalogoMateriasPrimas);
         }
 
+        [HttpGet("Dropdown")]
+#if RELEASE
+        [Authorize]
+#endif
+        public ActionResult GetGroupedDropdown()
+        {
+            List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTOBase>> dropdownAgrupado = new();
+
+            try
+            {
+                dropdownAgrupado = _service.GetGroupedDropdown();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(new { ex.Message });
+            }
+
+            return Ok(dropdownAgrupado);
+        }
+
         [HttpPost]
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        public ActionResult<MateriasPrimasItemDTO> Create(MateriasPrimasItemDTO itemMateriaPrima)
+        public ActionResult<MateriaPrimaDTO> Create(MateriaPrimaDTO itemMateriaPrima)
         {
             char origen = itemMateriaPrima.source;
             if (origen != 'C' && origen != 'E' && origen != 'P')
@@ -120,9 +139,9 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        public ActionResult Update(int id, JsonPatchDocument<MateriasPrimasItemDTO> patchDoc)
+        public ActionResult Update(int id, JsonPatchDocument<MateriaPrimaDTO> patchDoc)
         {
-            MateriasPrimasItemDTO item = _service.GetRawMaterialsItem(id);
+            MateriaPrimaDTO item = _service.GetRawMaterialsItem(id);
             if (item == null)
                 return NotFound("No existe la materia prima especificada");
 
@@ -134,7 +153,7 @@ namespace BoerisCreaciones.Api.Controllers
                 return NoContent();
 
             List<string> attributes = new();
-            foreach (Operation<MateriasPrimasItemDTO> ops in patchDoc.Operations)
+            foreach (Operation<MateriaPrimaDTO> ops in patchDoc.Operations)
                 attributes.Add(ops.path);
 
             try

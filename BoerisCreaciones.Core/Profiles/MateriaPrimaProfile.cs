@@ -9,9 +9,25 @@ namespace BoerisCreaciones.Core.Profiles
     {
         public MateriaPrimaVMtoDTOProfile()
         {
-            CreateMap<MateriasPrimasItemVM, MateriasPrimasItemDTO>()
+            CreateMap<MateriaPrimaVM, MateriaPrimaDTO>()
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_matP))
                 .ForMember(dest => dest.category, opt => opt.MapFrom(src => new RubroMateriaPrimaDTO(src.id_rubroMP, src.rubro)))
+                .ForMember(dest => dest.unit, opt => opt.MapFrom(src => new UnidadDTO(src.id_unidad, src.unidad)))
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
+                .ForMember(dest => dest.source, opt => opt.MapFrom(src => src.origen))
+                .ForMember(dest => dest.stock, opt => opt.MapFrom(src => src.cantidad_restante))
+                .ForMember(dest => dest.picture, opt => opt.MapFrom(src => src.imagen))
+                .ForMember(dest => dest.comment, opt => opt.MapFrom(src => src.comentario))
+                ;
+        }
+    }
+
+    public class MateriaPrimaVMtoDTOBaseProfile : Profile
+    {
+        public MateriaPrimaVMtoDTOBaseProfile()
+        {
+            CreateMap<MateriaPrimaVM, MateriaPrimaDTOBase>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_matP))
                 .ForMember(dest => dest.unit, opt => opt.MapFrom(src => new UnidadDTO(src.id_unidad, src.unidad)))
                 .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
                 .ForMember(dest => dest.source, opt => opt.MapFrom(src => src.origen))
@@ -26,7 +42,7 @@ namespace BoerisCreaciones.Core.Profiles
     {
         public MateriaPrimaDTOtoVMProfile()
         {
-            CreateMap<MateriasPrimasItemDTO, MateriasPrimasItemVM>()
+            CreateMap<MateriaPrimaDTO, MateriaPrimaVM>()
                 .ForMember(dest => dest.id_matP, opt => opt.MapFrom(src => src.id))
                 .ForMember(dest => dest.id_rubroMP, opt => opt.MapFrom(src => src.category.id))
                 .ForMember(dest => dest.rubro, opt => opt.MapFrom(src => src.category.name))

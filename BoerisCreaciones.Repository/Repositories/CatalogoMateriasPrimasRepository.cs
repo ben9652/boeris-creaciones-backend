@@ -17,9 +17,9 @@ namespace BoerisCreaciones.Repository.Repositories
             this.ctx = ctx;
         }
 
-        public List<MateriasPrimasItemVM> GetRawMaterialsItems()
+        public List<MateriaPrimaVM> GetRawMaterialsItems()
         {
-            List<MateriasPrimasItemVM> materiasPrimas = new List<MateriasPrimasItemVM>();
+            List<MateriaPrimaVM> materiasPrimas = new List<MateriaPrimaVM>();
 
             using(MySqlConnection conn = new MySqlConnection(connectionStringProvider.ConnectionString))
             {
@@ -36,7 +36,7 @@ namespace BoerisCreaciones.Repository.Repositories
                     object comentarioDB = reader["comentario"];
                     string? comentario = comentarioDB == DBNull.Value ? null : comentarioDB.ToString();
 
-                    MateriasPrimasItemVM materiaPrima = new MateriasPrimasItemVM(
+                    MateriaPrimaVM materiaPrima = new MateriaPrimaVM(
                         Convert.ToInt32(reader["id_matP"]),
                         Convert.ToInt32(reader["id_rubroMP"]),
                         reader["rubro"].ToString(),
@@ -59,9 +59,9 @@ namespace BoerisCreaciones.Repository.Repositories
             return materiasPrimas;
         }
 
-        public MateriasPrimasItemVM GetRawMaterialsItem(int id)
+        public MateriaPrimaVM GetRawMaterialsItem(int id)
         {
-            MateriasPrimasItemVM materiaPrima;
+            MateriaPrimaVM materiaPrima;
 
             using (MySqlConnection conn = new(connectionStringProvider.ConnectionString))
             {
@@ -78,7 +78,7 @@ namespace BoerisCreaciones.Repository.Repositories
                     object comentarioDB = reader["comentario"];
                     string? comentario = comentarioDB == DBNull.Value ? null : comentarioDB.ToString();
 
-                    materiaPrima = new MateriasPrimasItemVM(
+                    materiaPrima = new MateriaPrimaVM(
                         Convert.ToInt32(reader["id_matP"]),
                         Convert.ToInt32(reader["id_rubroMP"]),
                         reader["rubro"].ToString(),
@@ -101,7 +101,7 @@ namespace BoerisCreaciones.Repository.Repositories
             return materiaPrima;
         }
 
-        public MateriasPrimasItemVM CreateRawMaterialItem(MateriasPrimasItemVM item)
+        public MateriaPrimaVM CreateRawMaterialItem(MateriaPrimaVM item)
         {
             return ctx.LoadStoredProcedure("CrearMateriaPrima", connectionStringProvider)
                 .WithSqlParam("p_id_rubro", item.id_rubroMP)
@@ -110,10 +110,10 @@ namespace BoerisCreaciones.Repository.Repositories
                 .WithSqlParam("p_origen", item.origen)
                 .WithSqlParam("p_imagen", item.imagen)
                 .WithSqlParam("p_comentario", item.comentario)
-                .ExecuteSingleResultStoredProcedure<MateriasPrimasItemVM>();
+                .ExecuteSingleResultStoredProcedure<MateriaPrimaVM>();
         }
 
-        public MateriasPrimasItemVM UpdateRawMaterialItem(MateriasPrimasItemVM item, List<string> attributesToChange)
+        public MateriaPrimaVM UpdateRawMaterialItem(MateriaPrimaVM item, List<string> attributesToChange)
         {
             using (MySqlConnection conn = new MySqlConnection(connectionStringProvider.ConnectionString))
             {
@@ -145,7 +145,7 @@ namespace BoerisCreaciones.Repository.Repositories
                 .WithSqlParam("p_origen", item.origen)
                 .WithSqlParam("p_imagen", item.imagen)
                 .WithSqlParam("p_comentario", item.comentario)
-                .ExecuteSingleResultStoredProcedure<MateriasPrimasItemVM>();
+                .ExecuteSingleResultStoredProcedure<MateriaPrimaVM>();
         }
 
         public void DeleteRawMaterialItem(int id)

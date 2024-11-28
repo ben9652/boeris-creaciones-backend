@@ -19,46 +19,46 @@ namespace BoerisCreaciones.Service.Services
             _mapper = mapper;
         }
 
-        public List<ProductosItemDTO> GetProductsItems()
+        public List<ProductoDTO> GetProductsItems()
         {
-            List<ProductosItemDTO> productos = new List<ProductosItemDTO>();
-            List<ProductosItemVM> productosDB = _repository.GetProductsItems();
-            foreach(ProductosItemVM productoDB in productosDB)
-                productos.Add(_mapper.Map<ProductosItemDTO>(productoDB));
+            List<ProductoDTO> productos = new List<ProductoDTO>();
+            List<ProductoVM> productosDB = _repository.GetProductsItems();
+            foreach(ProductoVM productoDB in productosDB)
+                productos.Add(_mapper.Map<ProductoDTO>(productoDB));
 
             return productos;
         }
 
-        public ProductosItemDTO GetProductsItem(int id)
+        public ProductoDTO GetProductsItem(int id)
         {
-            ProductosItemVM productoDB = _repository.GetProductsItem(id);
-            return _mapper.Map<ProductosItemDTO>(productoDB);
+            ProductoVM productoDB = _repository.GetProductsItem(id);
+            return _mapper.Map<ProductoDTO>(productoDB);
         }
 
-        public ProductosItemDTO CreateProductItem(ProductosItemDTO item)
+        public ProductoDTO CreateProductItem(ProductoDTO item)
         {
             RubroProductoVM rubro = _repositoryRubrosP.CreateProductsCategory(item.name);
             item.category = new RubroProductoDTO(rubro.id_rubroP, rubro.nombre);
-            ProductosItemVM productoDB = _mapper.Map<ProductosItemVM>(item);
+            ProductoVM productoDB = _mapper.Map<ProductoVM>(item);
             productoDB = _repository.CreateProductItem(productoDB);
-            return _mapper.Map<ProductosItemDTO>(productoDB);
+            return _mapper.Map<ProductoDTO>(productoDB);
         }
 
-        public ProductosItemDTO UpdateProductItem(ProductosItemDTO item, List<string> attributesToChange)
+        public ProductoDTO UpdateProductItem(ProductoDTO item, List<string> attributesToChange)
         {
-            ProductosItemVM productoDB = _mapper.Map<ProductosItemVM>(item);
+            ProductoVM productoDB = _mapper.Map<ProductoVM>(item);
             productoDB = _repository.UpdateProductItem(productoDB, attributesToChange);
             if (attributesToChange.Find(str => str == "name") != null)
             {
                 productoDB.rubro = productoDB.nombre;
                 _repositoryRubrosP.ModifyProductsCategory(new RubroProductoVM(productoDB.id_rubroP, productoDB.rubro), new List<string> { "nombre" });
             }
-            return _mapper.Map<ProductosItemDTO>(productoDB);
+            return _mapper.Map<ProductoDTO>(productoDB);
         }
 
         public void DeleteProductItem(int id)
         {
-            ProductosItemVM producto = _repository.GetProductsItem(id);
+            ProductoVM producto = _repository.GetProductsItem(id);
             _repository.DeleteProductItem(id);
             _repositoryRubrosP.DeleteProductsCategory(producto.id_rubroP);
         }

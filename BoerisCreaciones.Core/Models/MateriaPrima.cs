@@ -3,14 +3,14 @@ using BoerisCreaciones.Core.Models.Unidades;
 
 namespace BoerisCreaciones.Core.Models.MateriasPrimas
 {
-    public class MateriasPrimasItemVM
+    public class MateriaPrimaVM
     {
-        public MateriasPrimasItemVM()
+        public MateriaPrimaVM()
         {
 
         }
 
-        public MateriasPrimasItemVM(int id_matP, int id_rubroMP, string rubro, int id_unidad, string unidad, string nombre, char origen, int cantidad_restante, int cantidad_descartada, string imagen, string comentario)
+        public MateriaPrimaVM(int id_matP, int id_rubroMP, string rubro, int id_unidad, string unidad, string nombre, char origen, int cantidad_restante, int cantidad_descartada, string imagen, string comentario)
         {
             this.id_matP = id_matP;
             this.id_rubroMP = id_rubroMP;
@@ -38,17 +38,16 @@ namespace BoerisCreaciones.Core.Models.MateriasPrimas
         public string? comentario { get; set; }
     }
 
-    public class MateriasPrimasItemDTO
+    public class MateriaPrimaDTOBase
     {
-        public MateriasPrimasItemDTO()
+        public MateriaPrimaDTOBase()
         {
 
         }
 
-        public MateriasPrimasItemDTO(int id, RubroMateriaPrimaDTO category, UnidadDTO unit, string name, char source, int stock, string picture, string comment)
+        public MateriaPrimaDTOBase(int id, UnidadDTO unit, string name, char source, int stock, string picture, string comment)
         {
             this.id = id;
-            this.category = category;
             this.unit = unit;
             this.name = name;
             this.source = source;
@@ -58,12 +57,27 @@ namespace BoerisCreaciones.Core.Models.MateriasPrimas
         }
 
         public int id { get; set; }
-        public RubroMateriaPrimaDTO category { get; set; }
         public UnidadDTO unit { get; set; }
         public string name { get; set; }
         public char source { get; set; }
         public int stock { get; set; }
         public string picture { get; set; }
         public string? comment { get; set; }
+    }
+
+    public class MateriaPrimaDTO : MateriaPrimaDTOBase
+    {
+        public MateriaPrimaDTO()
+        {
+
+        }
+
+        public MateriaPrimaDTO(int id, RubroMateriaPrimaDTO category, UnidadDTO unit, string name, char source, int stock, string picture, string comment)
+            : base(id, unit, name, source, stock, picture, comment)
+        {
+            this.category = category;
+        }
+
+        public RubroMateriaPrimaDTO category { get; set; }
     }
 }

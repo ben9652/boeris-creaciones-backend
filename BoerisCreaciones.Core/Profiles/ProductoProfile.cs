@@ -8,7 +8,7 @@ namespace BoerisCreaciones.Core.Profiles
     {
         public ProductoVMtoDTOProfile()
         {
-            CreateMap<ProductosItemVM, ProductosItemDTO>()
+            CreateMap<ProductoVM, ProductoDTO>()
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.id_producto))
                 .ForMember(dest => dest.category, opt => opt.MapFrom(src => new RubroProductoDTO(src.id_rubroP, src.nombre)))
                 .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.nombre))
@@ -24,7 +24,7 @@ namespace BoerisCreaciones.Core.Profiles
     {
         public ProductoDTOtoVMProfile()
         {
-            CreateMap<ProductosItemDTO, ProductosItemVM>()
+            CreateMap<ProductoDTO, ProductoVM>()
                 .ForMember(dest => dest.id_producto, opt => opt.MapFrom(src => src.id))
                 .ForMember(dest => dest.id_rubroP, opt => opt.MapFrom(src => src.category.id))
                 .ForMember(dest => dest.rubro, opt => opt.MapFrom(src => src.category.name))
