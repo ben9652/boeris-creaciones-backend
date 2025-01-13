@@ -7,6 +7,12 @@
             partnerRoles = new List<TipoSocioDTO>();
         }
 
+        public SocioDTO(int id_user, string username, string? lastName, string firstName, string email, char role)
+            : base(id_user, username, lastName, firstName, email, role)
+        {
+            partnerRoles = new List<TipoSocioDTO>();
+        }
+
         public List<TipoSocioDTO> partnerRoles;
     }
 

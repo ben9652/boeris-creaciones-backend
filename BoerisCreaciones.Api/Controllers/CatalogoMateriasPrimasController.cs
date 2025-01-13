@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using BoerisCreaciones.Service.Helpers;
 using BoerisCreaciones.Core.Models.PrimeNG.Dropdown;
 using BoerisCreaciones.Core.Models.Rubros;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -108,7 +109,7 @@ namespace BoerisCreaciones.Api.Controllers
 
             try
             {
-                string fileName = await MultimediaManging.UploadImage(files[0], _env.WebRootPath, controllerName);
+                string fileName = await MultimediaManaging.UploadImage(files[0], _env.WebRootPath, controllerName);
 
                 // Devolver la URL o la ruta del archivo guardado
                 url = $"{Request.Scheme}://{Request.Host}/{controllerName}/{fileName}";
@@ -130,7 +131,7 @@ namespace BoerisCreaciones.Api.Controllers
         {
             string controllerName = "CatalogoMateriasPrimas";
 
-            bool result = MultimediaManging.DeleteImage(imagePath, _env.WebRootPath, controllerName);
+            bool result = MultimediaManaging.DeleteImage(imagePath, _env.WebRootPath, controllerName);
 
             return Ok(result);
         }

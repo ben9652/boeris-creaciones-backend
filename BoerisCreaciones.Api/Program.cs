@@ -16,7 +16,7 @@ var envVariable = DotNetEnv.Env.Load();
 
 if (!DotEnv.CheckEnvVars())
 {
-    Console.WriteLine("No est�n definidas las variables de entorno necesarias correctamente.");
+    Console.WriteLine("No están definidas las variables de entorno necesarias correctamente.");
     Console.In.ReadLine();
     return;
 }
@@ -27,7 +27,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connection = builder.Configuration.GetConnectionString("BoerisCreacionesConnection");
 if (connection == null)
 {
-    Console.WriteLine("La cadena de conexi�n 'BoerisCreacionesConnection' no se encuentra en la configuraci�n.");
+    Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' no se encuentra en la configuración.");
     Console.In.ReadLine();
     return;
 }
@@ -42,7 +42,7 @@ else
 connection = DotEnv.ParseConnectionString(connection);
 if (connection == null)
 {
-    Console.WriteLine("La cadena de conexi�n 'BoerisCreacionesConnection' est� configurada incorrectamente.");
+    Console.WriteLine("La cadena de conexión 'BoerisCreacionesConnection' está configurada incorrectamente.");
     Console.In.ReadLine();
     return;
 }
@@ -92,14 +92,15 @@ builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>();
 builder.Services.AddScoped<ISociosRepository, SociosRepository>();
 builder.Services.AddScoped<IRolesSociosRepository, RolesSociosRepository>();
 builder.Services.AddScoped<IRubrosMateriasPrimasRepository, RubrosMateriasPrimasRepository>();
+builder.Services.AddScoped<IRubrosProductosRepository, RubrosProductosRepository>();
 builder.Services.AddScoped<IUnidadesRepository, UnidadesRepository>();
 builder.Services.AddScoped<ICatalogoMateriasPrimasRepository, CatalogoMateriasPrimasRepository>();
 builder.Services.AddScoped<ICatalogoProductosRepository, CatalogoProductosRepository>();
-builder.Services.AddScoped<IRubrosProductosRepository, RubrosProductosRepository>();
 builder.Services.AddScoped<ICatalogoProveedoresRepository, CatalogoProveedoresRepository>();
+builder.Services.AddScoped<ICatalogoSucursalesRepository, CatalogoSucursalesRepository>();
 builder.Services.AddScoped<IProvinciasRepository, ProvinciasRepository>();
 builder.Services.AddScoped<ILocalidadesRepository, LocalidadesRepository>();
-builder.Services.AddScoped<ICatalogoSucursalesRepository, CatalogoSucursalesRepository>();
+builder.Services.AddScoped<IComprasRepository, ComprasRepository>();
 
 // Esto le dice a la aplicaci�n que, cuando se inyecte una dependencia de tipo IUsuariosService, se debe instanciar un UsuariosService
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
@@ -110,9 +111,10 @@ builder.Services.AddScoped<IUnidadesService, UnidadesService>();
 builder.Services.AddScoped<ICatalogoMateriasPrimasService, CatalogoMateriasPrimasService>();
 builder.Services.AddScoped<ICatalogoProductosService, CatalogoProductosService>();
 builder.Services.AddScoped<ICatalogoProveedoresService, CatalogoProveedoresService>();
+builder.Services.AddScoped<ICatalogoSucursalesService, CatalogoSucursalesService>();
 builder.Services.AddScoped<IProvinciasService, ProvinciasService>();
 builder.Services.AddScoped<ILocalidadesService, LocalidadesService>();
-builder.Services.AddScoped<ICatalogoSucursalesService, CatalogoSucursalesService>();
+builder.Services.AddScoped<IComprasService, ComprasService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
