@@ -40,6 +40,9 @@ namespace BoerisCreaciones.Service.Services
 
             List<ProveedorVM> proveedoresBD = _repository.GetProviders();
 
+            if(proveedoresBD.Count == 0)
+                return groupedDropdown;
+
             proveedoresBD = proveedoresBD.OrderBy(proveedor => proveedor.id_rubro).ToList();
 
             RubroMateriaPrimaDTO rubro = new RubroMateriaPrimaDTO(proveedoresBD[0].id_rubro, proveedoresBD[0].rubroAsociado);

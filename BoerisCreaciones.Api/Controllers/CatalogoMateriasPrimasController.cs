@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using BoerisCreaciones.Service.Helpers;
 using BoerisCreaciones.Core.Models.PrimeNG.Dropdown;
 using BoerisCreaciones.Core.Models.Rubros;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BoerisCreaciones.Api.Controllers
 {
