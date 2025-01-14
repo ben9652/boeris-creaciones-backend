@@ -50,6 +50,9 @@ namespace BoerisCreaciones.Service.Services
 
             List<SucursalVM> sucursalesBD = _repository.GetAll();
 
+            if (sucursalesBD.Count == 0)
+                return groupedDropdown;
+
             sucursalesBD = sucursalesBD.OrderBy(sucursal => sucursal.id_localidad).ToList();
 
             LocalidadDTOBase localidad = new LocalidadDTOBase(sucursalesBD[0].id_localidad, sucursalesBD[0].localidad);

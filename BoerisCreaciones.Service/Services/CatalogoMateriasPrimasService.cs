@@ -40,6 +40,9 @@ namespace BoerisCreaciones.Service.Services
 
             List<MateriaPrimaVM> materiasPrimasBD = _repository.GetRawMaterialsItems();
 
+            if (materiasPrimasBD.Count == 0)
+                return groupedDropdown;
+
             materiasPrimasBD = materiasPrimasBD.OrderBy(materiaPrima => materiaPrima.id_rubroMP).ToList();
 
             RubroMateriaPrimaDTO rubro = new RubroMateriaPrimaDTO(materiasPrimasBD[0].id_rubroMP, materiasPrimasBD[0].rubro);

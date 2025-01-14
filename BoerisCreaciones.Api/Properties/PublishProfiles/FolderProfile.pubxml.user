@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <History>True|2025-01-14T00:21:05.0303955Z;True|2025-01-13T21:18:48.3626762-03:00;True|2025-01-13T20:42:54.6017083-03:00;False|2025-01-13T20:40:41.9926314-03:00;</History>
+    <LastFailureDetails />
+    <_PublishTargetUrl>C:\Users\ben96\boeris-creaciones\boeris-creaciones-backend\BoerisCreaciones.Api\bin\Release\net6.0\linux\BoerisCreacionesAPI</_PublishTargetUrl>
+  </PropertyGroup>
+</Project>
