@@ -7,6 +7,7 @@ using BoerisCreaciones.Service.Helpers;
 using BoerisCreaciones.Core.Models.PrimeNG.Dropdown;
 using BoerisCreaciones.Core.Models.Rubros;
 using Microsoft.AspNetCore.Authorization;
+using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -112,10 +113,11 @@ namespace BoerisCreaciones.Api.Controllers
                 string fileName = await MultimediaManging.UploadImage(files[0], _env.WebRootPath, controllerName);
 
                 // Devolver la URL o la ruta del archivo guardado
-                url = $"{Request.Scheme}://{Request.Host}/{controllerName}/{fileName}";
+                url = $"https://{Request.Host}:9354/{controllerName}/{fileName}";
             }
             catch(Exception ex)
             {
+                Log.Error(ex.Message);
                 _logger.LogError(ex.Message);
                 return BadRequest(new { ex.Message });
             }
