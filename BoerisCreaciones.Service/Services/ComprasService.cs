@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
-using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Core.Models.Compras;
-using BoerisCreaciones.Core.Models.Proveedores;
 using BoerisCreaciones.Repository.Interfaces;
 using BoerisCreaciones.Service.Interfaces;
 
@@ -15,11 +13,12 @@ namespace BoerisCreaciones.Service.Services
         private readonly IRolesSociosService _rolesSociosService;
         private readonly IMapper _mapper;
 
-        public ComprasService(IComprasRepository repositoryCompras, ICatalogoProveedoresRepository repositoryCatalogoProveedores, IUsuariosRepository repositoryUsuarios, IMapper mapper)
+        public ComprasService(IComprasRepository repositoryCompras, ICatalogoProveedoresRepository repositoryCatalogoProveedores, IUsuariosRepository repositoryUsuarios, IRolesSociosService rolesSociosService, IMapper mapper)
         {
             _repositoryCompras = repositoryCompras;
             _repositoryCatalogoProveedores = repositoryCatalogoProveedores;
             _repositoryUsuarios = repositoryUsuarios;
+            _rolesSociosService = rolesSociosService;
             _mapper = mapper;
         }
 
@@ -132,7 +131,7 @@ namespace BoerisCreaciones.Service.Services
             return compraNuevaDTO;
         }
 
-        public void ReceivePurchase(int idPurchase, int userId)
+        public void ReceivePurchase(int idPurchase, int userId, int idBranch)
         {
             char estado = _repositoryCompras.GetPurchaseById(idPurchase).estado;
             if (estado == 'C')
@@ -147,7 +146,7 @@ namespace BoerisCreaciones.Service.Services
                 throw new Exception("La compra no existe");
             }
 
-            _repositoryCompras.ReceivePurchase(idPurchase, userId);
+            _repositoryCompras.ReceivePurchase(idPurchase, userId, idBranch);
         }  
 
         public void CancelPurchase(int idPurchase)

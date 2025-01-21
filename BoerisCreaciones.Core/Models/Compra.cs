@@ -1,7 +1,7 @@
-﻿using BoerisCreaciones.Core.Models.MateriasPrimas;
-using BoerisCreaciones.Core.Models.Proveedores;
+﻿using BoerisCreaciones.Core.Models.Proveedores;
 using BoerisCreaciones.Core.Models.Rubros;
 using BoerisCreaciones.Core.Models.Socio;
+using BoerisCreaciones.Core.Models.Sucursales;
 
 namespace BoerisCreaciones.Core.Models.Compras
 {
@@ -77,7 +77,7 @@ namespace BoerisCreaciones.Core.Models.Compras
     {
         public CompraVM() { }
 
-        public CompraVM(int id_compra, UsuarioVM socio_que_hizo_pedido, ProveedorVM proveedor, string descripcion, DateTime fecha_pedido, DateTime? fecha_recepcion, DateTime? fecha_cancelado, string moneda, char tipo_pago, char modo_recepcion, char estado, float? precio, string? factura)
+        public CompraVM(int id_compra, UsuarioVM socio_que_hizo_pedido, ProveedorVM proveedor, string descripcion, DateTime fecha_pedido, DateTime? fecha_recepcion, DateTime? fecha_cancelado, string moneda, char tipo_pago, char modo_recepcion, char estado, SucursalVM? sucursal, float? precio, string? factura)
         {
             this.id_compra = id_compra;
             this.socio_que_hizo_pedido = socio_que_hizo_pedido;
@@ -105,6 +105,7 @@ namespace BoerisCreaciones.Core.Models.Compras
         public char tipo_pago { get; set; }
         public char modo_recepcion { get; set; }
         public char estado { get; set; }
+        public SucursalVM? sucursal { get; set; }
         public float? precio { get; set; }
         public string? factura { get; set; }
     }
@@ -116,7 +117,7 @@ namespace BoerisCreaciones.Core.Models.Compras
             raw_materials = new List<MateriaPrimaCompraDTO>();
         }
 
-        public CompraDTO(int id, UsuarioDTO requester_partner, ProveedorDTO provider, string description, DateTime order_date, DateTime? reception_date, DateTime? canceled_date, string currency, char payment_type, char reception_mode, char status, float? price, string? invoice)
+        public CompraDTO(int id, UsuarioDTO requester_partner, ProveedorDTO provider, string description, DateTime order_date, DateTime? reception_date, DateTime? canceled_date, string currency, char payment_type, char reception_mode, char status, SucursalDTO? reception_branch, float? price, string? invoice)
         {
             this.id= id;
             this.requester_partner = requester_partner;
@@ -129,6 +130,7 @@ namespace BoerisCreaciones.Core.Models.Compras
             this.payment_type = payment_type;
             this.reception_mode = reception_mode;
             this.status = status;
+
             this.price = price;
             this.invoice = invoice;
 
@@ -147,6 +149,7 @@ namespace BoerisCreaciones.Core.Models.Compras
         public char payment_type { get; set; }
         public char reception_mode { get; set; }
         public char status { get; set; }
+        public SucursalDTO? reception_branch { get; set; }
         public float? price { get; set; }
         public string? invoice { get; set; }
     }
