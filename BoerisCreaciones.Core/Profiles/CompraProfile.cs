@@ -18,13 +18,15 @@ namespace BoerisCreaciones.Core.Profiles
                 .ForMember(dest => dest.description, opt => opt.MapFrom(src => src.descripcion))
                 .ForMember(dest => dest.order_date, opt => opt.MapFrom(src => src.fecha_pedido))
                 .ForMember(dest => dest.reception_date, opt => opt.MapFrom(src => src.fecha_recepcion))
-                .ForMember(dest => dest.canceled_date, opt => opt.MapFrom(src => src.fecha_cancelado))
+                .ForMember(dest => dest.cancel_date, opt => opt.MapFrom(src => src.fecha_cancelado))
                 .ForMember(dest => dest.currency, opt => opt.MapFrom(src => src.moneda))
                 .ForMember(dest => dest.payment_type, opt => opt.MapFrom(src => src.tipo_pago))
                 .ForMember(dest => dest.reception_mode, opt => opt.MapFrom(src => src.modo_recepcion))
-                .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.estado))
+                .ForMember(dest => dest.budget, opt => opt.MapFrom(src => src.presupuesto))
+                .ForMember(dest => dest.state, opt => opt.MapFrom(src => src.estado))
+                .ForMember(dest => dest.final_price, opt => opt.MapFrom(src => src.precio_final))
+                .ForMember(dest => dest.additional_amount_reason, opt => opt.MapFrom(src => src.razon_monto_adicional))
                 .ForMember(dest => dest.reception_branch, opt => opt.MapFrom((src, dest, _, context) => context.Mapper.Map<SucursalDTO>(src.sucursal)))
-                .ForMember(dest => dest.price, opt => opt.MapFrom(src => src.precio))
                 .ForMember(dest => dest.invoice, opt => opt.MapFrom(src => src.factura))
             ;
         }

@@ -8,8 +8,8 @@ namespace BoerisCreaciones.Repository.Interfaces
         public CompraVM GetPurchaseById(int idPurchase);
         public List<CompraVM> GetPurchasesByPartner(int idPartner);
         public List<MateriaPrimaCompraVM> GetPurchasedRawMaterials(int idPurchase);
-        public CompraVM AddPurchase(NuevaCompraDTO newPurchase);
-        public void ReceivePurchase(int idPurchase, int idUser, int idBranch);
+        public CompraVM AddPurchase(NuevaCompra newPurchase);
+        public void ReceivePurchase(int idPurchase, int idUser, RecepcionCompra purchaseReception);
         public void CancelPurchase(int idPurchase);
         public void DisablePurchase(int idPurchase);
         public void DeletePurchase(int idPurchase);

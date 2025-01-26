@@ -1,6 +1,9 @@
 ﻿using BoerisCreaciones.Core;
+using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Core.Models.Compras;
 using BoerisCreaciones.Core.Models.MateriasPrimas;
+using BoerisCreaciones.Core.Models.Proveedores;
+using BoerisCreaciones.Core.Models.Sucursales;
 using BoerisCreaciones.Repository.Interfaces;
 using MySql.Data.MySqlClient;
 
@@ -39,27 +42,48 @@ namespace BoerisCreaciones.Repository.Repositories
                     object fechaRecepcionDB = reader["fecha_recepcion"];
                     object fechaCanceladoDB = reader["fecha_cancelado"];
 
-                    object precioDB = reader["precio"];
+                    object precioFinalDB = reader["precio_final"];
+                    object razonMontoAdicional = reader["razon_monto_adicional"];
                     object facturaDB = reader["factura"];
 
-                    CompraVM compraVM = new CompraVM(
-                        reader.GetInt32("id_compra"),
-                        _repositorySocios.GetUserById(reader.GetInt32("id_socio")),
-                        _repositoryProveedores.GetProvider(reader.GetInt32("id_proveedor")),
-                        reader["descripcion"].ToString(),
-                        reader.GetDateTime("fecha_pedido"),
+                    object idSucursalDB = reader["id_sucursal"];
+                    int id_sucursal = idSucursalDB == DBNull.Value ? 0 : reader.GetInt32("id_sucursal");
+
+                    int id = reader.GetInt32("id_compra");
+                    UsuarioVM socio = _repositorySocios.GetUserById(reader.GetInt32("id_socio"));
+                    ProveedorVM proveedor = _repositoryProveedores.GetProvider(reader.GetInt32("id_proveedor"));
+                    string? descripcion = reader["descripcion"].ToString();
+                    DateTime fecha_pedido = reader.GetDateTime("fecha_pedido");
+                    string? moneda = reader["moneda"].ToString();
+                    char tipo_pago = reader.GetChar("tipo_pago");
+                    char modo_recepcion = reader.GetChar("modo_recepcion");
+                    float presupuesto = reader.GetFloat("presupuesto");
+                    char estado = reader.GetChar("estado");
+
+                    SucursalVM? sucursal = null;
+                    if (id_sucursal != 0)
+                        sucursal = _repositorySucursales.GetById(id_sucursal);
+
+                    CompraVM compra = new CompraVM(
+                        id,
+                        socio,
+                        proveedor,
+                        descripcion,
+                        fecha_pedido,
                         fechaRecepcionDB == DBNull.Value ? null : (DateTime?)fechaRecepcionDB,
                         fechaCanceladoDB == DBNull.Value ? null : (DateTime?)fechaCanceladoDB,
-                        reader["moneda"].ToString(),
-                        reader.GetChar("tipo_pago"),
-                        reader.GetChar("modo_recepcion"),
-                        reader.GetChar("estado"),
-                        _repositorySucursales.GetById(reader.GetInt32("id_sucursal")),
-                        precioDB == DBNull.Value ? null : (float)Convert.ToDouble(precioDB),
-                        facturaDB == DBNull.Value ? null : reader["factura"].ToString()
+                        moneda,
+                        tipo_pago,
+                        modo_recepcion,
+                        presupuesto,
+                        estado,
+                        precioFinalDB == DBNull.Value ? null : reader.GetFloat("precio_final"),
+                        razonMontoAdicional == DBNull.Value ? null : razonMontoAdicional.ToString(),
+                        sucursal,
+                        facturaDB == DBNull.Value ? null : facturaDB.ToString()
                     );
 
-                    comprasVM.Add(compraVM);
+                    comprasVM.Add(compra);
                 }
             }
 
@@ -84,24 +108,45 @@ namespace BoerisCreaciones.Repository.Repositories
                     object fechaRecepcionDB = reader["fecha_recepcion"];
                     object fechaCanceladoDB = reader["fecha_cancelado"];
 
-                    object precioDB = reader["precio"];
+                    object precioFinalDB = reader["precio_final"];
+                    object razonMontoAdicional = reader["razon_monto_adicional"];
                     object facturaDB = reader["factura"];
 
+                    object idSucursalDB = reader["id_sucursal"];
+                    int id_sucursal = idSucursalDB == DBNull.Value ? 0 : reader.GetInt32("id_sucursal");
+
+                    int id = reader.GetInt32("id_compra");
+                    UsuarioVM socio = _repositorySocios.GetUserById(reader.GetInt32("id_socio"));
+                    ProveedorVM proveedor = _repositoryProveedores.GetProvider(reader.GetInt32("id_proveedor"));
+                    string? descripcion = reader["descripcion"].ToString();
+                    DateTime fecha_pedido = reader.GetDateTime("fecha_pedido");
+                    string? moneda = reader["moneda"].ToString();
+                    char tipo_pago = reader.GetChar("tipo_pago");
+                    char modo_recepcion = reader.GetChar("modo_recepcion");
+                    float presupuesto = reader.GetFloat("presupuesto");
+                    char estado = reader.GetChar("estado");
+
+                    SucursalVM? sucursal = null;
+                    if(id_sucursal != 0)
+                        sucursal = _repositorySucursales.GetById(id_sucursal);
+
                     compra = new CompraVM(
-                        reader.GetInt32("id_compra"),
-                        _repositorySocios.GetUserById(reader.GetInt32("id_socio")),
-                        _repositoryProveedores.GetProvider(reader.GetInt32("id_proveedor")),
-                        reader["descripcion"].ToString(),
-                        reader.GetDateTime("fecha_pedido"),
+                        id,
+                        socio,
+                        proveedor,
+                        descripcion,
+                        fecha_pedido,
                         fechaRecepcionDB == DBNull.Value ? null : (DateTime?)fechaRecepcionDB,
                         fechaCanceladoDB == DBNull.Value ? null : (DateTime?)fechaCanceladoDB,
-                        reader["moneda"].ToString(),
-                        reader.GetChar("tipo_pago"),
-                        reader.GetChar("modo_recepcion"),
-                        reader.GetChar("estado"),
-                        _repositorySucursales.GetById(reader.GetInt32("id_sucursal")),
-                        precioDB == DBNull.Value ? null : (float)Convert.ToDouble(precioDB),
-                        facturaDB == DBNull.Value ? null : reader["factura"].ToString()
+                        moneda,
+                        tipo_pago,
+                        modo_recepcion,
+                        presupuesto,
+                        estado,
+                        precioFinalDB == DBNull.Value ? null : reader.GetFloat("precio_final"),
+                        razonMontoAdicional == DBNull.Value ? null : razonMontoAdicional.ToString(),
+                        sucursal,
+                        facturaDB == DBNull.Value ? null : facturaDB.ToString()
                     );
                 }
             }
@@ -127,24 +172,45 @@ namespace BoerisCreaciones.Repository.Repositories
                     object fechaRecepcionDB = reader["fecha_recepcion"];
                     object fechaCanceladoDB = reader["fecha_cancelado"];
 
-                    object precioDB = reader["precio"];
+                    object precioFinalDB = reader["precio_final"];
+                    object razonMontoAdicional = reader["razon_monto_adicional"];
                     object facturaDB = reader["factura"];
 
+                    object idSucursalDB = reader["id_sucursal"];
+                    int id_sucursal = idSucursalDB == DBNull.Value ? 0 : reader.GetInt32("id_sucursal");
+
+                    int id = reader.GetInt32("id_compra");
+                    UsuarioVM socio = _repositorySocios.GetUserById(reader.GetInt32("id_socio"));
+                    ProveedorVM proveedor = _repositoryProveedores.GetProvider(reader.GetInt32("id_proveedor"));
+                    string? descripcion = reader["descripcion"].ToString();
+                    DateTime fecha_pedido = reader.GetDateTime("fecha_pedido");
+                    string? moneda = reader["moneda"].ToString();
+                    char tipo_pago = reader.GetChar("tipo_pago");
+                    char modo_recepcion = reader.GetChar("modo_recepcion");
+                    float presupuesto = reader.GetFloat("presupuesto");
+                    char estado = reader.GetChar("estado");
+
+                    SucursalVM? sucursal = null;
+                    if (id_sucursal != 0)
+                        sucursal = _repositorySucursales.GetById(id_sucursal);
+
                     CompraVM compra = new CompraVM(
-                        reader.GetInt32("id_compra"),
-                        _repositorySocios.GetUserById(reader.GetInt32("id_socio")),
-                        _repositoryProveedores.GetProvider(reader.GetInt32("id_proveedor")),
-                        reader["descripcion"].ToString(),
-                        reader.GetDateTime("fecha_pedido"),
+                        id,
+                        socio,
+                        proveedor,
+                        descripcion,
+                        fecha_pedido,
                         fechaRecepcionDB == DBNull.Value ? null : (DateTime?)fechaRecepcionDB,
                         fechaCanceladoDB == DBNull.Value ? null : (DateTime?)fechaCanceladoDB,
-                        reader["moneda"].ToString(),
-                        reader.GetChar("tipo_pago"),
-                        reader.GetChar("modo_recepcion"),
-                        reader.GetChar("estado"),
-                        _repositorySucursales.GetById(reader.GetInt32("id_sucursal")),
-                        precioDB == DBNull.Value ? null : (float)Convert.ToDouble(precioDB),
-                        facturaDB == DBNull.Value ? null : reader["factura"].ToString()
+                        moneda,
+                        tipo_pago,
+                        modo_recepcion,
+                        presupuesto,
+                        estado,
+                        precioFinalDB == DBNull.Value ? null : reader.GetFloat("precio_final"),
+                        razonMontoAdicional == DBNull.Value ? null : razonMontoAdicional.ToString(),
+                        sucursal,
+                        facturaDB == DBNull.Value ? null : facturaDB.ToString()
                     );
 
                     compras.Add(compra);
@@ -187,12 +253,14 @@ namespace BoerisCreaciones.Repository.Repositories
             return materiasPrimas;
         }
 
-        public CompraVM AddPurchase(NuevaCompraDTO newPurchase)
+        public CompraVM AddPurchase(NuevaCompra newPurchase)
         {
+            float totalPrice = newPurchase.raw_materials.Sum(m => m.quantity * m.unit_price);
+
             using (MySqlConnection connection = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO ComprasMateriasPrimas (id_socio, id_proveedor, descripcion, fecha_pedido, moneda, tipo_pago, modo_recepcion, estado) VALUES (@id_socio, @id_proveedor, @descripcion, @fecha_pedido, @moneda, @tipo_pago, @modo_recepcion, @estado)";
+                string query = "INSERT INTO ComprasMateriasPrimas (id_socio, id_proveedor, descripcion, fecha_pedido, moneda, tipo_pago, modo_recepcion, presupuesto, estado) VALUES (@id_socio, @id_proveedor, @descripcion, @fecha_pedido, @moneda, @tipo_pago, @modo_recepcion, @presupuesto, @estado)";
                 MySqlCommand command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@id_socio", newPurchase.partner.id_user);
                 command.Parameters.AddWithValue("@id_proveedor", newPurchase.provider.id);
@@ -201,6 +269,7 @@ namespace BoerisCreaciones.Repository.Repositories
                 command.Parameters.AddWithValue("@moneda", newPurchase.currency);
                 command.Parameters.AddWithValue("@tipo_pago", newPurchase.payment_type);
                 command.Parameters.AddWithValue("@modo_recepcion", newPurchase.reception_mode);
+                command.Parameters.AddWithValue("@presupuesto", totalPrice);
                 command.Parameters.AddWithValue("@estado", 'P');
                 command.Prepare();
                 command.ExecuteNonQuery();
@@ -238,14 +307,24 @@ namespace BoerisCreaciones.Repository.Repositories
             return GetPurchaseById(idCompra);
         }
 
-        public void ReceivePurchase(int idPurchase, int idUser, int idBranch)
+        public void ReceivePurchase(int idPurchase, int idUser, RecepcionCompra purchaseReception)
         {
             using (MySqlConnection connection = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 connection.Open();
-                string query = "UPDATE ComprasMateriasPrimas SET estado = 'R', fecha_recepcion = @fecha WHERE id_compra = @id";
-                MySqlCommand command = new MySqlCommand(query, connection);
+                MySqlCommand command = new MySqlCommand($"SELECT presupuesto FROM ComprasMateriasPrimas WHERE id_compra = {idPurchase}", connection);
+                MySqlDataReader reader = command.ExecuteReader();
+
+                float presupuesto = 0;
+                if(reader.Read())
+                    presupuesto = reader.GetFloat(0);
+
+                string query = "UPDATE ComprasMateriasPrimas SET estado = 'R', fecha_recepcion = @fecha, precio_final = @precio, razon_monto_adicional = @razon, factura = @factura WHERE id_compra = @id";
+                command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@fecha", DateTime.Now);
+                command.Parameters.AddWithValue("@precio", presupuesto + purchaseReception.additional_amount);
+                command.Parameters.AddWithValue("@razon", purchaseReception.additional_amount_reason != null ? purchaseReception.additional_amount_reason : DBNull.Value);
+                command.Parameters.AddWithValue("@factura", purchaseReception.invoice != null ? purchaseReception.invoice : DBNull.Value);
                 command.Parameters.AddWithValue("@id", idPurchase);
                 command.Prepare();
                 command.ExecuteNonQuery();
