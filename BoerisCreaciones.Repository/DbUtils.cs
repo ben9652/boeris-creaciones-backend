@@ -130,14 +130,15 @@ namespace BoerisCreaciones.Repository
                 while (dr.Read())
                 {
                     T obj = Activator.CreateInstance<T>();
-                    foreach (var prop in props)
+                    foreach (PropertyInfo prop in props)
                     {
                         try
                         {
                             DbColumn colmap = colMapping[prop.Name.ToLower()];
                             int index = colmap.ColumnOrdinal.Value - 1;
+                            string? type = prop.PropertyType.FullName;
                             var val = dr.GetValue(index);
-                            if(val is string && val.ToString().Length == 1)
+                            if(type == "System.Char" && val is string && val.ToString().Length == 1)
                             {
                                 char c = val.ToString()[0];
                                 prop.SetValue(obj, c);

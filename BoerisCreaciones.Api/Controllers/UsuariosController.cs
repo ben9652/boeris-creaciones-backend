@@ -34,7 +34,8 @@ namespace BoerisCreaciones.Api.Controllers
         [HttpGet("Testing")]
         public ActionResult<string> Test(string? optStr)
         {
-            return Ok("Bienvenido al controlador de usuarios " + optStr);
+            string message = "Bienvenido al controlador de usuarios";
+            return Ok(message + (optStr != null ? $" {optStr}" : ""));
         }
 
         [HttpGet]
