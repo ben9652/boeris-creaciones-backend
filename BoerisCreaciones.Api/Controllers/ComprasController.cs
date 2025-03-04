@@ -1,16 +1,18 @@
 ﻿using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Core.Models.Compras;
 using BoerisCreaciones.Core.Models.MateriasPrimas;
+using BoerisCreaciones.Core.Models.PrimeNG;
 using BoerisCreaciones.Core.Models.Proveedores;
 using BoerisCreaciones.Service.Helpers;
 using BoerisCreaciones.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoerisCreaciones.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ComprasController : ControllerBase
+    public class ComprasController : Controller
     {
         private readonly IComprasService _comprasService;
         private readonly IWebHostEnvironment _env;
@@ -35,10 +37,10 @@ namespace BoerisCreaciones.Api.Controllers
             }
         }
 
+        [HttpGet]
 #if RELEASE
         [Authorize(Roles = "a,sa,ss")]
 #endif
-        [HttpGet]
         public IActionResult GetCompras(int userId)
         {
             List<CompraDTO> compras = new List<CompraDTO>();
@@ -54,10 +56,10 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(compras);
         }
 
+        [HttpGet("{id}")]
 #if RELEASE
         [Authorize(Roles = "a,sa,ss")]
 #endif
-        [HttpGet("{id}")]
         public IActionResult GetCompra(int id, int userId)
         {
             CompraDTO compra;
@@ -77,11 +79,19 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(compra);
         }
 
+        [HttpGet("ordenamiento")]
+        public IActionResult GetArbolOrdenamiento()
+        {
+            List<TreeNode<string>> treeNodes = _comprasService.GetSortNodes();
+            
+            return Ok(new { tree = treeNodes, initialIndex = "1-0" });
+        }
+
+        [HttpPost]
 #if RELEASE
         [Authorize(Roles = "a,sa,ss")]
 #endif
-        [HttpPost]
-        public IActionResult PostCompra(NuevaCompraDTO compra)
+        public IActionResult PostCompra(NuevaCompra compra)
         {
             if(compra.raw_materials == null || compra.raw_materials.Count == 0)
                 return BadRequest("La compra debe tener al menos una materia prima");
@@ -120,15 +130,15 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(compraNueva);
         }
 
+        [HttpPost("recibir/{id}/{userId}")]
 #if RELEASE
         [Authorize(Roles = "a,ss")]
 #endif
-        [HttpPost("recibir/{id}/{userId}/{idBranch}")]
-        public IActionResult RecibirCompra(int id, int userId, int idBranch)
+        public IActionResult RecibirCompra(int id, int userId, RecepcionCompra purchaseReception)
         {
             try
             {
-                _comprasService.ReceivePurchase(id, userId, idBranch);
+                _comprasService.ReceivePurchase(id, userId, purchaseReception);
             }
             catch (Exception ex)
             {
@@ -139,10 +149,10 @@ namespace BoerisCreaciones.Api.Controllers
             return NoContent();
         }
 
+        [HttpPost("cancelar/{id}-{userId}")]
 #if RELEASE
         [Authorize(Roles = "a,ss")]
 #endif
-        [HttpPost("cancelar/{id}-{userId}")]
         public IActionResult CancelarCompra(int id)
         {
             try
@@ -158,10 +168,10 @@ namespace BoerisCreaciones.Api.Controllers
             return NoContent();
         }
 
+        [HttpPost("dar-de-baja/{id}")]
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        [HttpPost("{id}/dar-de-baja")]
         public IActionResult DarDeBajaCompra(int id)
         {
             try
@@ -177,10 +187,10 @@ namespace BoerisCreaciones.Api.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{id}")]
 #if RELEASE
         [Authorize(Roles = "a,sa")]
 #endif
-        [HttpDelete("{id}")]
         public IActionResult EliminarCompra(int id)
         {
             try

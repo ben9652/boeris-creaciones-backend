@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;

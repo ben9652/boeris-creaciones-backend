@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Core.Models.Compras;
+using BoerisCreaciones.Core.Models.PrimeNG;
 using BoerisCreaciones.Repository.Interfaces;
 using BoerisCreaciones.Service.Interfaces;
 
@@ -39,12 +41,15 @@ namespace BoerisCreaciones.Service.Services
                 purchasesDTO.Add(purchaseDTO);
             }
 
+            UsuarioVM user = _repositoryUsuarios.GetUserById(userId);
+            if (user.id_usuario != 1)
+            {
+                List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
 
-            List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
-
-            // Elimino cada compra que tiene de estado 'I' (inactivo) si el usuario es un surtidor
-            if (roles.Contains("ss"))
-                purchasesDTO.RemoveAll(p => p.status == 'I');
+                // Elimino cada compra que tiene de estado 'I' (inactivo) si el usuario es un surtidor
+                if (roles.Contains("ss"))
+                    purchasesDTO.RemoveAll(p => p.state == 'I');
+            }
 
             return purchasesDTO;
         }
@@ -52,11 +57,16 @@ namespace BoerisCreaciones.Service.Services
         public CompraDTO GetPurchaseById(int idPurchase, int userId)
         {
             CompraVM purchase = _repositoryCompras.GetPurchaseById(idPurchase);
-            List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
 
-            // Si el usuario es un surtidor y la compra está inactiva, no la devuelvo
-            if (roles.Contains("ss") && purchase.estado == 'I')
-                return null;
+            UsuarioVM user = _repositoryUsuarios.GetUserById(userId);
+            if(user.id_usuario != 1)
+            { 
+                List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
+
+                // Si el usuario es un surtidor y la compra está inactiva, no la devuelvo
+                if (roles.Contains("ss") && purchase.estado == 'I')
+                    return null;
+            }
 
             List<MateriaPrimaCompraVM> rawMaterialPurchase = _repositoryCompras.GetPurchasedRawMaterials(idPurchase);
             CompraDTO purchaseDTO = _mapper.Map<CompraDTO>(purchase);
@@ -87,22 +97,30 @@ namespace BoerisCreaciones.Service.Services
                 purchasesDTO.Add(purchaseDTO);
             }
 
-            List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
+            UsuarioVM user = _repositoryUsuarios.GetUserById(userId);
+            if (user.id_usuario != 1)
+            {
+                List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
 
-            // Elimino cada compra que tiene de estado 'I' (inactivo) si el usuario es un surtidor
-            if (roles.Contains("ss"))
-                purchasesDTO.RemoveAll(p => p.status == 'I');
+                // Elimino cada compra que tiene de estado 'I' (inactivo) si el usuario es un surtidor
+                if (roles.Contains("ss"))
+                    purchasesDTO.RemoveAll(p => p.state == 'I');
+            }
 
             return purchasesDTO;
         }
 
         public List<MateriaPrimaCompraDTO> GetPurchasedRawMaterials(int idPurchase, int userId)
         {
-            List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
+            UsuarioVM user = _repositoryUsuarios.GetUserById(userId);
+            if (user.id_usuario != 1)
+            {
+                List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
 
-            // Si el usuario es un surtidor y la compra está inactiva, no devuelvo las materias primas
-            if (roles.Contains("ss") && _repositoryCompras.GetPurchaseById(idPurchase).estado == 'I')
-                throw new Exception("La compra no existe");
+                // Si el usuario es un surtidor y la compra está inactiva, no devuelvo las materias primas
+                if (roles.Contains("ss") && _repositoryCompras.GetPurchaseById(idPurchase).estado == 'I')
+                    return null;
+            }
 
             List<MateriaPrimaCompraVM> rawMaterials = _repositoryCompras.GetPurchasedRawMaterials(idPurchase);
             List<MateriaPrimaCompraDTO> rawMaterialsDTO = new List<MateriaPrimaCompraDTO>();
@@ -115,7 +133,32 @@ namespace BoerisCreaciones.Service.Services
             return rawMaterialsDTO;
         }
 
-        public CompraDTO AddPurchase(NuevaCompraDTO newPurchase)
+        public List<TreeNode<string>> GetSortNodes()
+        {
+            List<TreeNode<string>> treeNodes = new List<TreeNode<string>>();
+
+            TreeNode<string> alpha = new TreeNode<string>("0", "Alfabéticamente", "fas fa-font", "1", false);
+            TreeNode<string> date = new TreeNode<string>("1", "Por fecha", "fas fa-calendar", "2", false);
+            TreeNode<string> numbers = new TreeNode<string>("2", "Por número", "fas fa-hashtag", "3", false);
+
+            alpha.children.Add(new TreeNode<string>("0-0", "Proveedores", "fas fa-user-tie", "1", "provider.name", new TreeNode<string>(alpha.key, alpha.label, alpha.icon, alpha.type, false)));
+            alpha.children.Add(new TreeNode<string>("0-1", "Socios", "fas fa-user", "1", "requester_partner.firstName", new TreeNode<string>(alpha.key, alpha.label, alpha.icon, alpha.type, false)));
+
+            date.children.Add(new TreeNode<string>("1-0", "Pedido", "fas fa-calendar-check", "2", "order_date", new TreeNode<string>(date.key, date.label, date.icon, date.type, false)));
+            date.children.Add(new TreeNode<string>("1-1", "Recepción", "fas fa-calendar-plus", "2", "reception_date", new TreeNode<string>(date.key, date.label, date.icon, date.type, false)));
+            date.children.Add(new TreeNode<string>("1-2", "Cancelación", "fas fa-calendar-minus", "2", "canceled_date", new TreeNode<string>(date.key, date.label, date.icon, date.type, false)));
+
+            numbers.children.Add(new TreeNode<string>("2-0", "Costo", "fas fa-dollar-sign", "3", "price", new TreeNode<string>(numbers.key, numbers.label, numbers.icon, numbers.type, false)));
+            numbers.children.Add(new TreeNode<string>("2-1", "ID", "fas fa-barcode", "3", "id", new TreeNode<string>(numbers.key, numbers.label, numbers.icon, numbers.type, false)));
+
+            treeNodes.Add(alpha);
+            treeNodes.Add(date);
+            treeNodes.Add(numbers);
+
+            return treeNodes;
+        }
+
+        public CompraDTO AddPurchase(NuevaCompra newPurchase)
         {
             CompraVM compraNueva = _repositoryCompras.AddPurchase(newPurchase);
             CompraDTO compraNuevaDTO = _mapper.Map<CompraDTO>(compraNueva);
@@ -131,7 +174,7 @@ namespace BoerisCreaciones.Service.Services
             return compraNuevaDTO;
         }
 
-        public void ReceivePurchase(int idPurchase, int userId, int idBranch)
+        public void ReceivePurchase(int idPurchase, int userId, RecepcionCompra purchaseReception)
         {
             char estado = _repositoryCompras.GetPurchaseById(idPurchase).estado;
             if (estado == 'C')
@@ -146,8 +189,8 @@ namespace BoerisCreaciones.Service.Services
                 throw new Exception("La compra no existe");
             }
 
-            _repositoryCompras.ReceivePurchase(idPurchase, userId, idBranch);
-        }  
+            _repositoryCompras.ReceivePurchase(idPurchase, userId, purchaseReception);
+        }
 
         public void CancelPurchase(int idPurchase)
         {
