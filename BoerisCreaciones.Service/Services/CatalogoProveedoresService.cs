@@ -34,34 +34,37 @@ namespace BoerisCreaciones.Service.Services
             return _mapper.Map<ProveedorDTO>(proveedorBD);
         }
 
-        public List<SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTOBase>> GetGroupedDropdown()
+        public List<SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTO>> GetGroupedDropdown(List<int>? categories)
         {
-            List<SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTOBase>> groupedDropdown = new();
+            List<SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTO>> groupedDropdown = new();
 
-            List<ProveedorVM> proveedoresBD = _repository.GetProviders();
+            List<ProveedorVM> proveedoresBD = _repository.GetProviders(categories);
 
             if(proveedoresBD.Count == 0)
                 return groupedDropdown;
 
             proveedoresBD = proveedoresBD.OrderBy(proveedor => proveedor.id_rubro).ToList();
 
+            if (proveedoresBD.Count == 0)
+                return groupedDropdown;
+
             RubroMateriaPrimaDTO rubro = new RubroMateriaPrimaDTO(proveedoresBD[0].id_rubro, proveedoresBD[0].rubroAsociado);
-            List<SelectItem<ProveedorDTOBase>> group = new();
+            List<SelectItem<ProveedorDTO>> group = new();
             foreach (ProveedorVM proveedor in proveedoresBD)
             {
                 if (proveedor.id_rubro != rubro.id)
                 {
-                    List<SelectItem<ProveedorDTOBase>> newGroup = new(group);
-                    groupedDropdown.Add(new SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTOBase>(rubro.name, rubro, newGroup));
+                    List<SelectItem<ProveedorDTO>> newGroup = new(group);
+                    groupedDropdown.Add(new SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTO>(rubro.name, rubro, newGroup));
                     rubro = new RubroMateriaPrimaDTO(proveedor.id_rubro, proveedor.rubroAsociado);
                     group.Clear();
                 }
 
-                ProveedorDTOBase proveedorDTO = _mapper.Map<ProveedorDTOBase>(proveedor);
-                group.Add(new SelectItem<ProveedorDTOBase>(proveedorDTO.name, proveedorDTO));
+                ProveedorDTO proveedorDTO = _mapper.Map<ProveedorDTO>(proveedor);
+                group.Add(new SelectItem<ProveedorDTO>(proveedorDTO.name, proveedorDTO));
             }
 
-            groupedDropdown.Add(new SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTOBase>(rubro.name, rubro, group));
+            groupedDropdown.Add(new SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTO>(rubro.name, rubro, group));
 
             return groupedDropdown;
         }

@@ -21,6 +21,13 @@ namespace BoerisCreaciones.Api.Controllers
             _logger = logger;
             _service = service;
             _env = env;
+
+            var webRootPath = _env.WebRootPath;
+            if (string.IsNullOrEmpty(webRootPath))
+            {
+                webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                _env.WebRootPath = webRootPath;
+            }
         }
 
         [HttpGet]
@@ -97,7 +104,7 @@ namespace BoerisCreaciones.Api.Controllers
 
             try
             {
-                string fileName = await MultimediaManging.UploadImage(files[0], _env.WebRootPath, controllerName);
+                string fileName = await MultimediaManaging.UploadImage(files[0], _env.WebRootPath, controllerName);
 
                 // Devolver la URL o la ruta del archivo guardado
                 url = $"https://{Request.Host}:9354/{controllerName}/{fileName}";
@@ -119,7 +126,7 @@ namespace BoerisCreaciones.Api.Controllers
         {
             string controllerName = "CatalogoProductos";
 
-            bool result = MultimediaManging.DeleteImage(imagePath, _env.WebRootPath, controllerName);
+            bool result = MultimediaManaging.DeleteImage(imagePath, _env.WebRootPath, controllerName);
 
             return Ok(result);
         }

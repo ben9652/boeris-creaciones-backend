@@ -44,9 +44,9 @@ namespace BoerisCreaciones.Service.Services
             return sucursalDTO;
         }
 
-        public List<SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>> GetGroupedDropdown()
+        public List<SelectItemGroup<LocalidadDTOBase, SucursalDTO>> GetGroupedDropdown()
         {
-            List<SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>> groupedDropdown = new();
+            List<SelectItemGroup<LocalidadDTOBase, SucursalDTO>> groupedDropdown = new();
 
             List<SucursalVM> sucursalesBD = _repository.GetAll();
 
@@ -56,22 +56,22 @@ namespace BoerisCreaciones.Service.Services
             sucursalesBD = sucursalesBD.OrderBy(sucursal => sucursal.id_localidad).ToList();
 
             LocalidadDTOBase localidad = new LocalidadDTOBase(sucursalesBD[0].id_localidad, sucursalesBD[0].localidad);
-            List<SelectItem<SucursalDTOBase>> group = new();
+            List<SelectItem<SucursalDTO>> group = new();
             foreach(SucursalVM sucursal in sucursalesBD)
             {
                 if(sucursal.id_localidad != localidad.id)
                 {
-                    List<SelectItem<SucursalDTOBase>> newGroup = new(group);
-                    groupedDropdown.Add(new SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>(localidad.name, localidad, newGroup));
+                    List<SelectItem<SucursalDTO>> newGroup = new(group);
+                    groupedDropdown.Add(new SelectItemGroup<LocalidadDTOBase, SucursalDTO>(localidad.name, localidad, newGroup));
                     localidad = new LocalidadDTOBase(sucursal.id_localidad, sucursal.localidad);
                     group.Clear();
                 }
 
-                SucursalDTOBase sucursalDTO = _mapper.Map<SucursalDTOBase>(sucursal);
-                group.Add(new SelectItem<SucursalDTOBase>(sucursalDTO.name, sucursalDTO));
+                SucursalDTO sucursalDTO = _mapper.Map<SucursalDTO>(sucursal);
+                group.Add(new SelectItem<SucursalDTO>(sucursalDTO.name, sucursalDTO));
             }
 
-            groupedDropdown.Add(new SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>(localidad.name, localidad, group));
+            groupedDropdown.Add(new SelectItemGroup<LocalidadDTOBase, SucursalDTO>(localidad.name, localidad, group));
 
             return groupedDropdown;
         }

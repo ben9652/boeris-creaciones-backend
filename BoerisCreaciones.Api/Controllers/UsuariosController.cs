@@ -5,9 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Net.Mail;
 using System.Security.Claims;
 
 namespace BoerisCreaciones.Api.Controllers
@@ -34,7 +31,8 @@ namespace BoerisCreaciones.Api.Controllers
         [HttpGet("Testing")]
         public ActionResult<string> Test(string? optStr)
         {
-            return Ok("Bienvenido al controlador de usuarios " + optStr);
+            string message = "Bienvenido al controlador de usuarios";
+            return Ok(message + (optStr != null ? $" {optStr}" : ""));
         }
 
         [HttpGet]

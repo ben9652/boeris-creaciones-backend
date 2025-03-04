@@ -17,7 +17,7 @@ namespace BoerisCreaciones.Repository.Repositories
             this.ctx = ctx;
         }
 
-        public List<MateriaPrimaVM> GetRawMaterialsItems()
+        public List<MateriaPrimaVM> GetRawMaterialsItems(List<int>? categories = null)
         {
             List<MateriaPrimaVM> materiasPrimas = new List<MateriaPrimaVM>();
 
@@ -26,6 +26,18 @@ namespace BoerisCreaciones.Repository.Repositories
                 conn.Open();
 
                 string queryString = "SELECT * FROM V_ListarCatalogoMateriasPrimas";
+
+                if (categories != null)
+                {
+                    queryString += " WHERE id_rubroMP IN (";
+                    for (int i = 0; i < categories.Count; i++)
+                    {
+                        queryString += categories[i];
+                        if (i < categories.Count - 1)
+                            queryString += ", ";
+                    }
+                    queryString += ")";
+                }
 
                 MySqlCommand cmd = new MySqlCommand(queryString, conn);
 

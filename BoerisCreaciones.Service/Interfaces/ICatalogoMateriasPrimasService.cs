@@ -8,7 +8,7 @@ namespace BoerisCreaciones.Service.Interfaces
     {
         public List<MateriaPrimaDTO> GetRawMaterialsItems();
         public MateriaPrimaDTO GetRawMaterialsItem(int id);
-        public List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTOBase>> GetGroupedDropdown();
+        public List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTO>> GetGroupedDropdown(List<int>? categories = null);
         public MateriaPrimaDTO CreateRawMaterialItem(MateriaPrimaDTO item);
         public MateriaPrimaDTO UpdateRawMaterialItem(MateriaPrimaDTO item, List<string> attributesToChange);
         public void DeleteRawMaterialItem(int id);

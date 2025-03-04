@@ -41,6 +41,16 @@ namespace BoerisCreaciones.Service.Services
             return partnersList;
         }
 
+        public SocioDTO GetPartner(int id)
+        {
+            UsuarioVM partnerDB = _repository.GetPartner(id);
+            if (partnerDB == null)
+                throw new Exception("Socio no encontrado");
+            SocioDTO partner = _mapper.Map<SocioDTO>(partnerDB);
+            partner.partnerRoles = _rolesService.GetPartnerRolesCompleteNames(partner.id_user);
+            return partner;
+        }
+
         private static bool isAdminPartner(SocioDTO partner)
         {
             foreach(TipoSocioDTO role in partner.partnerRoles)

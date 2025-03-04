@@ -49,7 +49,7 @@ namespace BoerisCreaciones.Api.Controllers
 #endif
         public ActionResult GetGroupedDropdown()
         {
-            List<SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>> dropdownAgrupado = new();
+            List<SelectItemGroup<LocalidadDTOBase, SucursalDTO>> dropdownAgrupado = new();
 
             try
             {

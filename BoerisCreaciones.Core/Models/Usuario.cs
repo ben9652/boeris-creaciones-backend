@@ -114,6 +114,30 @@ namespace BoerisCreaciones.Core.Models
         public string password { get; set; }
     }
 
+    public class RespuestaLogin
+    {
+        public RespuestaLogin()
+        {
+
+        }
+
+        public RespuestaLogin(UsuarioDTO? user, string? token)
+        {
+            if(user != null && token != null)
+            {
+                this.success = true;
+                this.user = user;
+                this.token = token;
+            }
+            else
+                this.success = false;
+        }
+
+        public bool success { get; set; }
+        public UsuarioDTO? user { get; set; }
+        public string? token { get; set; }
+    }
+
     public class UsuarioRegistro
     {
         public UsuarioRegistro(

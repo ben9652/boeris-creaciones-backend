@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -72,7 +73,7 @@ namespace BoerisCreaciones.Api.Controllers
 #endif
         public ActionResult GetGroupedDropdown()
         {
-            List<SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTOBase>> dropdownAgrupado = new();
+            List<SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTO>> dropdownAgrupado = new();
 
             try
             {
@@ -84,6 +85,38 @@ namespace BoerisCreaciones.Api.Controllers
                 return BadRequest(new { ex.Message });
             }
 
+            return Ok(dropdownAgrupado);
+        }
+
+        [HttpGet("Dropdown/{categories}")]
+#if RELEASE
+        [Authorize]
+#endif
+        public ActionResult GetGroupedDropdownWithFilters(string categories)
+        {
+            // Si `categories` no es una serie de números enteros separados por guiones, devolver un BadRequest
+            if (!Regex.IsMatch(categories, @"^(\d+-)*\d+$"))
+                return BadRequest(new { Message = "El formato de las categorías es inválido" });
+
+            List<int> categoriesList = new();
+            if (!string.IsNullOrEmpty(categories))
+            {
+                string[] categoriesArray = categories.Split('-');
+                foreach (string category in categoriesArray)
+                    categoriesList.Add(int.Parse(category));
+            }
+
+            List<SelectItemGroup<RubroMateriaPrimaDTO, ProveedorDTO>> dropdownAgrupado = new();
+
+            try
+            {
+                dropdownAgrupado = _service.GetGroupedDropdown(categoriesList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(new { ex.Message });
+            }
             return Ok(dropdownAgrupado);
         }
 

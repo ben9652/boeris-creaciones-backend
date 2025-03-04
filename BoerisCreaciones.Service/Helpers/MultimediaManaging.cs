@@ -3,7 +3,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace BoerisCreaciones.Service.Helpers
 {
-    public class MultimediaManging
+    public class MultimediaManaging
     {
         public static async Task<string> UploadImage(IFormFile file, string rootPath, string controllerName)
         {
@@ -58,6 +58,52 @@ namespace BoerisCreaciones.Service.Helpers
             }
 
             return false;
+        }
+
+        public static async Task<string> UploadFile(IFormFile file, string rootPath, string controllerName)
+        {
+            string contentType = file.ContentType;
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("No se proporcionó un archivo válido");
+
+            var uploadsPath = Path.Combine(rootPath, controllerName);
+            if (!Directory.Exists(uploadsPath))
+                Directory.CreateDirectory(uploadsPath);
+
+            string extension;
+            switch (contentType)
+            {
+                case "application/pdf":
+                    extension = ".pdf";
+                    break;
+                case "application/msword":
+                    extension = ".doc";
+                    break;
+                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                    extension = ".docx";
+                    break;
+                case "image/jpeg":
+                    extension = ".jpg";
+                    break;
+                case "image/png":
+                    extension = ".png";
+                    break;
+                default:
+                    throw new FormatException("Formato no soportado");
+            }
+
+            // Generar un nombre único para el archivo
+            var fileName = Guid.NewGuid().ToString() + extension;
+
+            // Ruta para guardar el archivo en el servidor
+            var filePath = Path.Combine(uploadsPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return fileName;
         }
     }
 }
