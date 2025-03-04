@@ -4,6 +4,7 @@ using BoerisCreaciones.Core.Models.Socio;
 using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -35,7 +36,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return NotFound(new { ex.Message });
             }
 
@@ -55,7 +56,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return NotFound(new { ex.Message });
             }
             return Ok(partner);
@@ -74,10 +75,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 partner = _service.RegisterPartner(partnerObj);
+                Log.Information($"Socio registrado: {partner.id_user}");
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return StatusCode(412, new { ex.Message });
             }
 
@@ -93,10 +95,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _service.DeletePartner(id);
+                Log.Information($"Socio eliminado: {id}");
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return StatusCode(412, new { ex.Message });
             }
 

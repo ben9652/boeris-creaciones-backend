@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -15,16 +16,14 @@ namespace BoerisCreaciones.Api.Controllers
     {
         private readonly IUsuariosService _service;
         private readonly IRolesSociosService _partnersRolesService;
-        private readonly ILogger<UsuariosController> _logger;
         private readonly IMapper _mapper;
 
         private const string MENSAJE_EXITO = "Éxito";
 
-        public UsuariosController(IUsuariosService service, IRolesSociosService partnersRolesService, ILogger<UsuariosController> logger, IMapper mapper)
+        public UsuariosController(IUsuariosService service, IRolesSociosService partnersRolesService, IMapper mapper)
         {
             _service = service;
             _partnersRolesService = partnersRolesService;
-            _logger = logger;
             _mapper = mapper;
         }
 
@@ -93,7 +92,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 response = ex.Message;
                 error = true;
             }
@@ -107,7 +106,7 @@ namespace BoerisCreaciones.Api.Controllers
 #endif
         public ActionResult<MensajeSolicitud> RegisterUser(UsuarioRegistro userObj)
         {
-            if(userObj == null)
+            if (userObj == null)
                 return BadRequest();
 
             string response = MENSAJE_EXITO;
@@ -116,16 +115,18 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _service.RegisterUser(userObj);
+                Log.Information($"Usuario registrado: {userObj.username}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 response = ex.Message;
                 error = true;
             }
 
             return Ok(new MensajeSolicitud(response, error));
         }
+
 
         [HttpPatch("{id}")]
 #if RELEASE
@@ -157,7 +158,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return Ok(new MensajeSolicitud(ex.Message, true));
             }
 
@@ -177,6 +178,7 @@ namespace BoerisCreaciones.Api.Controllers
                 return NotFound(new MensajeSolicitud("No existe el usuario", true));
 
             _service.DeleteUser(id);
+            Log.Information($"Usuario eliminado: {user.username}");
 
             return Ok(new MensajeSolicitud("Usuario eliminado con éxito", false));
         }

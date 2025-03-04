@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -14,12 +15,10 @@ namespace BoerisCreaciones.Api.Controllers
     public class CatalogoSucursalesController : Controller
     {
         private readonly ICatalogoSucursalesService _service;
-        private readonly ILogger<CatalogoSucursalesController> _logger;
 
-        public CatalogoSucursalesController(ICatalogoSucursalesService service, ILogger<CatalogoSucursalesController> logger)
+        public CatalogoSucursalesController(ICatalogoSucursalesService service)
         {
             _service = service;
-            _logger = logger;
         }
 
         [HttpGet]
@@ -36,7 +35,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return NotFound(new { ex.Message });
             }
 
@@ -57,7 +56,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -73,10 +72,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 sucursal = _service.Create(sucursal);
+                Log.Information($"Sucursal creada: {sucursal.id}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -110,7 +110,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -126,10 +126,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _service.Delete(id);
+                Log.Information($"Sucursal eliminada: {id}");
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return StatusCode(412, new { ex.Message });
             }
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -12,13 +13,11 @@ namespace BoerisCreaciones.Api.Controllers
     [ApiController]
     public class CatalogoProductosController : Controller
     {
-        private readonly ILogger<CatalogoProductosController> _logger;
         private readonly ICatalogoProductosService _service;
         private readonly IWebHostEnvironment _env;
 
-        public CatalogoProductosController(ILogger<CatalogoProductosController> logger, ICatalogoProductosService service, IWebHostEnvironment env)
+        public CatalogoProductosController(ICatalogoProductosService service, IWebHostEnvironment env)
         {
-            _logger = logger;
             _service = service;
             _env = env;
 
@@ -44,7 +43,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return NotFound(new { ex.Message });
             }
 
@@ -65,7 +64,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return NotFound(new { ex.Message });
             }
 
@@ -81,10 +80,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 item = _service.CreateProductItem(item);
+                Log.Information($"Producto creado: {item.id}");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return NotFound(new { ex.Message });
             }
 
@@ -111,7 +111,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -158,7 +158,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -174,10 +174,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _service.DeleteProductItem(id);
+                Log.Information($"Producto eliminado: {id}");
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return StatusCode(412, new { ex.Message });
             }
 
