@@ -72,7 +72,7 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 sucursal = _service.Create(sucursal);
-                Log.Information($"Sucursal creada: {sucursal.id}");
+                Log.Information($"Sucursal creada: {sucursal.name} ({sucursal.id})");
             }
             catch (Exception ex)
             {

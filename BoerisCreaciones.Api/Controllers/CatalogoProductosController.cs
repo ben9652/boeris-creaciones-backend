@@ -80,7 +80,7 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 item = _service.CreateProductItem(item);
-                Log.Information($"Producto creado: {item.id}");
+                Log.Information($"Producto creado: {item.name} ({item.id})");
             }
             catch (Exception ex)
             {

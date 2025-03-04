@@ -75,7 +75,7 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 partner = _service.RegisterPartner(partnerObj);
-                Log.Information($"Socio registrado: {partner.id_user}");
+                Log.Information($"Socio registrado: {partner.firstName} {partner.lastName} ({partner.id_user})");
             }
             catch(Exception ex)
             {

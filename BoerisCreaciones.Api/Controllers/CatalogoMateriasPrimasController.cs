@@ -120,7 +120,7 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 itemMateriaPrima = _service.CreateRawMaterialItem(itemMateriaPrima);
-                Log.Information($"Materia prima creada: {itemMateriaPrima.id}");
+                Log.Information($"Materia prima creada: {itemMateriaPrima.name} ({itemMateriaPrima.id})");
             }
             catch(Exception ex)
             {

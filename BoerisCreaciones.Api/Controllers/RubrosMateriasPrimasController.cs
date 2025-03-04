@@ -49,7 +49,7 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 rubro = _service.CreateRawMaterialCategory(rubro.name);
-                Log.Information($"Rubro de materia prima creado: {rubro.id}");
+                Log.Information($"Rubro de materia prima creado: {rubro.name} ({rubro.id})");
             }
             catch (Exception ex)
             {

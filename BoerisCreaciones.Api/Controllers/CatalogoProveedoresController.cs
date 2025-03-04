@@ -128,7 +128,7 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 proveedor = _service.CreateProvider(proveedor);
-                Log.Information($"Proveedor creado: {proveedor.id}");
+                Log.Information($"Proveedor creado: {proveedor.name} ({proveedor.id})");
             }
             catch (Exception ex)
             {

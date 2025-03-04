@@ -211,7 +211,7 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 purchase = _comprasService.ReceivePurchase(id, (int)userId, purchaseReception);
-                Log.Information($"Compra recibida: {purchase.id}");
+                Log.Information($"Compra recibida: {purchase.description} ({purchase.id})");
             }
             catch (Exception ex)
             {

@@ -70,6 +70,7 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 localidad = _service.Create(localidad);
+                Log.Information($"Localidad creada: {localidad.name} ({localidad.id})");
             }
             catch (Exception ex)
             {

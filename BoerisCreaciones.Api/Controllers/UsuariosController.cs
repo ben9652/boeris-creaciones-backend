@@ -89,6 +89,8 @@ namespace BoerisCreaciones.Api.Controllers
                 }
                 else
                     response = _service.GenerateToken(user, null);
+
+                Log.Information($"Usuario inició sesión: {user.username}");
             }
             catch(Exception ex)
             {
