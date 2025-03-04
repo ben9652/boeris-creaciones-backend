@@ -3,6 +3,7 @@ using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Core.Models.Compras;
 using BoerisCreaciones.Core.Models.Proveedores;
 using BoerisCreaciones.Core.Models.Rubros;
+using BoerisCreaciones.Core.Models.Sucursales;
 
 namespace BoerisCreaciones.Core.Profiles
 {
@@ -22,6 +23,7 @@ namespace BoerisCreaciones.Core.Profiles
                 .ForMember(dest => dest.payment_type, opt => opt.MapFrom(src => src.tipo_pago))
                 .ForMember(dest => dest.reception_mode, opt => opt.MapFrom(src => src.modo_recepcion))
                 .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.estado))
+                .ForMember(dest => dest.reception_branch, opt => opt.MapFrom((src, dest, _, context) => context.Mapper.Map<SucursalDTO>(src.sucursal)))
                 .ForMember(dest => dest.price, opt => opt.MapFrom(src => src.precio))
                 .ForMember(dest => dest.invoice, opt => opt.MapFrom(src => src.factura))
             ;

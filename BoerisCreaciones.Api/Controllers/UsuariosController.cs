@@ -1,13 +1,9 @@
 ﻿using AutoMapper;
 using BoerisCreaciones.Core.Models;
 using BoerisCreaciones.Service.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Net.Mail;
 using System.Security.Claims;
 
 namespace BoerisCreaciones.Api.Controllers

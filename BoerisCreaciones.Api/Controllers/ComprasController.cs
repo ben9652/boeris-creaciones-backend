@@ -2,14 +2,9 @@
 using BoerisCreaciones.Core.Models.Compras;
 using BoerisCreaciones.Core.Models.MateriasPrimas;
 using BoerisCreaciones.Core.Models.Proveedores;
-using BoerisCreaciones.Service;
 using BoerisCreaciones.Service.Helpers;
 using BoerisCreaciones.Service.Interfaces;
-using BoerisCreaciones.Service.Services;
-using DotNetEnv;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -128,12 +123,12 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,ss")]
 #endif
-        [HttpPost("{id}/recibir")]
-        public IActionResult RecibirCompra(int id, int userId)
+        [HttpPost("recibir/{id}/{userId}/{idBranch}")]
+        public IActionResult RecibirCompra(int id, int userId, int idBranch)
         {
             try
             {
-                _comprasService.ReceivePurchase(id, userId);
+                _comprasService.ReceivePurchase(id, userId, idBranch);
             }
             catch (Exception ex)
             {
@@ -147,7 +142,7 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,ss")]
 #endif
-        [HttpPost("{id}/cancelar")]
+        [HttpPost("cancelar/{id}-{userId}")]
         public IActionResult CancelarCompra(int id)
         {
             try

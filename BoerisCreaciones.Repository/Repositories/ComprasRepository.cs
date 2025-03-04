@@ -12,13 +12,15 @@ namespace BoerisCreaciones.Repository.Repositories
         private readonly IUsuariosRepository _repositorySocios;
         private readonly ICatalogoProveedoresRepository _repositoryProveedores;
         private readonly ICatalogoMateriasPrimasRepository _materiasPrimasRepository;
+        private readonly ICatalogoSucursalesRepository _repositorySucursales;
 
-        public ComprasRepository(ConnectionStringProvider connectionStringProvider, IUsuariosRepository repositorySocios, ICatalogoProveedoresRepository repositoryProveedores, ICatalogoMateriasPrimasRepository materiasPrimasRepository)
+        public ComprasRepository(ConnectionStringProvider connectionStringProvider, IUsuariosRepository repositorySocios, ICatalogoProveedoresRepository repositoryProveedores, ICatalogoMateriasPrimasRepository materiasPrimasRepository, ICatalogoSucursalesRepository repositorySucursales)
         {
             _connectionStringProvider = connectionStringProvider;
             _repositorySocios = repositorySocios;
             _repositoryProveedores = repositoryProveedores;
             _materiasPrimasRepository = materiasPrimasRepository;
+            _repositorySucursales = repositorySucursales;
         }
 
         public List<CompraVM> GetPurchases()
@@ -52,6 +54,7 @@ namespace BoerisCreaciones.Repository.Repositories
                         reader.GetChar("tipo_pago"),
                         reader.GetChar("modo_recepcion"),
                         reader.GetChar("estado"),
+                        _repositorySucursales.GetById(reader.GetInt32("id_sucursal")),
                         precioDB == DBNull.Value ? null : (float)Convert.ToDouble(precioDB),
                         facturaDB == DBNull.Value ? null : reader["factura"].ToString()
                     );
@@ -96,6 +99,7 @@ namespace BoerisCreaciones.Repository.Repositories
                         reader.GetChar("tipo_pago"),
                         reader.GetChar("modo_recepcion"),
                         reader.GetChar("estado"),
+                        _repositorySucursales.GetById(reader.GetInt32("id_sucursal")),
                         precioDB == DBNull.Value ? null : (float)Convert.ToDouble(precioDB),
                         facturaDB == DBNull.Value ? null : reader["factura"].ToString()
                     );
@@ -138,6 +142,7 @@ namespace BoerisCreaciones.Repository.Repositories
                         reader.GetChar("tipo_pago"),
                         reader.GetChar("modo_recepcion"),
                         reader.GetChar("estado"),
+                        _repositorySucursales.GetById(reader.GetInt32("id_sucursal")),
                         precioDB == DBNull.Value ? null : (float)Convert.ToDouble(precioDB),
                         facturaDB == DBNull.Value ? null : reader["factura"].ToString()
                     );
@@ -233,7 +238,7 @@ namespace BoerisCreaciones.Repository.Repositories
             return GetPurchaseById(idCompra);
         }
 
-        public void ReceivePurchase(int idPurchase, int idUser)
+        public void ReceivePurchase(int idPurchase, int idUser, int idBranch)
         {
             using (MySqlConnection connection = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
