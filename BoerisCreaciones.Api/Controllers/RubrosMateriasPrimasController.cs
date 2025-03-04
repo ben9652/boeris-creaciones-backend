@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -13,12 +14,10 @@ namespace BoerisCreaciones.Api.Controllers
     public class RubrosMateriasPrimasController : Controller
     {
         private readonly IRubrosMateriasPrimasService _service;
-        private readonly ILogger<RubrosMateriasPrimasController> _logger;
 
-        public RubrosMateriasPrimasController(IRubrosMateriasPrimasService service, ILogger<RubrosMateriasPrimasController> logger)
+        public RubrosMateriasPrimasController(IRubrosMateriasPrimasService service)
         {
             _service = service;
-            _logger = logger;
         }
 
         [HttpGet]
@@ -34,7 +33,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -50,15 +49,17 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 rubro = _service.CreateRawMaterialCategory(rubro.name);
+                Log.Information($"Rubro de materia prima creado: {rubro.id}");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
             return Ok(rubro);
         }
+
 
         [HttpPatch("{id}")]
 #if RELEASE
@@ -87,7 +88,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -103,15 +104,16 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _service.DeleteRawMaterialCategory(id);
+                Log.Information($"Rubro de materia prima eliminado: {id}");
             }
             catch(MySqlException ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return StatusCode(412, new { Message = "El rubro que se quiere eliminar está siendo utilizado por una materia prima" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return StatusCode(412, new { ex.Message });
             }
 

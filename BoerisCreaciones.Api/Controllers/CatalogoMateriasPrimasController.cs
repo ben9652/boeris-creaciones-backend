@@ -17,13 +17,11 @@ namespace BoerisCreaciones.Api.Controllers
     public class CatalogoMateriasPrimasController : Controller
     {
         private readonly ICatalogoMateriasPrimasService _service;
-        private readonly ILogger<CatalogoMateriasPrimasController> _logger;
         private readonly IWebHostEnvironment _env;
 
-        public CatalogoMateriasPrimasController(ICatalogoMateriasPrimasService service, ILogger<CatalogoMateriasPrimasController> logger, IWebHostEnvironment env)
+        public CatalogoMateriasPrimasController(ICatalogoMateriasPrimasService service, IWebHostEnvironment env)
         {
             _service = service;
-            _logger = logger;
             _env = env;
 
             var webRootPath = _env.WebRootPath;
@@ -48,7 +46,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -69,7 +67,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -102,7 +100,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -122,10 +120,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 itemMateriaPrima = _service.CreateRawMaterialItem(itemMateriaPrima);
+                Log.Information($"Materia prima creada: {itemMateriaPrima.id}");
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -153,7 +152,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch(Exception ex)
             {
                 Log.Error(ex.Message);
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -200,7 +199,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -216,10 +215,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _service.DeleteRawMaterialItem(id);
+                Log.Information($"Materia prima eliminada: {id}");
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return StatusCode(412, new { ex.Message });
             }
 

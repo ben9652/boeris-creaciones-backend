@@ -3,6 +3,7 @@ using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -11,14 +12,12 @@ namespace BoerisCreaciones.Api.Controllers
     public class RolesSociosController : ControllerBase
     {
         private readonly IRolesSociosService _service;
-        private readonly ILogger<RolesSociosController> _logger;
 
         private const string MENSAJE_EXITO = "Éxito";
 
-        public RolesSociosController(IRolesSociosService service, ILogger<RolesSociosController> logger)
+        public RolesSociosController(IRolesSociosService service)
         {
             _service = service;
-            _logger = logger;
         }
 
         [HttpGet]
@@ -34,7 +33,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return NotFound(new { ex.Message });
             }
 
@@ -54,7 +53,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -70,10 +69,13 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _service.AssignRoles(id, roles);
+
+                string rolesString = string.Join(", ", roles);
+                Log.Information($"Roles {rolesString} asignados al socio con id {id}");
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -92,7 +94,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 
@@ -108,10 +110,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _service.DeleteRoles(id);
+                Log.Information($"Roles del socio con id {id} eliminados");
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { ex.Message });
             }
 

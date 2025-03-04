@@ -2,6 +2,7 @@
 using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -10,12 +11,10 @@ namespace BoerisCreaciones.Api.Controllers
     public class UnidadesController : Controller
     {
         private readonly IUnidadesService _unidadesService;
-        private readonly ILogger<UnidadesController> _logger;
 
         public UnidadesController(IUnidadesService unidadesService, ILogger<UnidadesController> logger)
         {
             _unidadesService = unidadesService;
-            _logger = logger;
         }
 
         [HttpGet]
@@ -28,7 +27,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return NotFound(ex.Message);
             }
 

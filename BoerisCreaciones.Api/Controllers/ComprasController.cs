@@ -7,6 +7,7 @@ using BoerisCreaciones.Service.Helpers;
 using BoerisCreaciones.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
 {
@@ -16,16 +17,14 @@ namespace BoerisCreaciones.Api.Controllers
     {
         private readonly IComprasService _comprasService;
         private readonly IWebHostEnvironment _env;
-        private readonly ILogger<ComprasController> _logger;
         private readonly ICatalogoProveedoresService _proveedoresService;
         private readonly IUsuariosService _sociosService;
         private readonly ICatalogoMateriasPrimasService _materiasPrimasService;
 
-        public ComprasController(IComprasService comprasService, IWebHostEnvironment env, ILogger<ComprasController> logger, ICatalogoProveedoresService proveedoresService, IUsuariosService sociosService, ICatalogoMateriasPrimasService materiasPrimasService)
+        public ComprasController(IComprasService comprasService, IWebHostEnvironment env, ICatalogoProveedoresService proveedoresService, IUsuariosService sociosService, ICatalogoMateriasPrimasService materiasPrimasService)
         {
             _comprasService = comprasService;
             _env = env;
-            _logger = logger;
             _proveedoresService = proveedoresService;
             _sociosService = sociosService;
             _materiasPrimasService = materiasPrimasService;
@@ -99,7 +98,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener las compras");
+                Log.Error(ex, "Error al obtener las compras");
                 return BadRequest(new { message = ex.Message });
             }
             return Ok(compras);
@@ -125,7 +124,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener la compra {id}", id);
+                Log.Error(ex, "Error al obtener la compra {id}", id);
                 return BadRequest(new { message = ex.Message });
             }
             return Ok(compra);
@@ -159,7 +158,7 @@ namespace BoerisCreaciones.Api.Controllers
 #endif
         public IActionResult PostCompra(NuevaCompra compra)
         {
-            if(compra.raw_materials == null || compra.raw_materials.Count == 0)
+            if (compra.raw_materials == null || compra.raw_materials.Count == 0)
                 return BadRequest(new { message = "La compra debe tener al menos una materia prima" });
             UsuarioVM socio = _sociosService.GetUserById(compra.partner.id_user);
             if (socio == null || (socio != null && socio.rol != 's'))
@@ -186,15 +185,17 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 compraNueva = _comprasService.AddPurchase(compra);
+                Log.Information($"Compra creada: {compraNueva.id}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al agregar la compra");
+                Log.Error(ex, "Error al agregar la compra");
                 return BadRequest(new { message = ex.Message });
             }
 
             return Ok(compraNueva);
         }
+
 
         [HttpPost("recibir/{id}-{userId}")]
 #if RELEASE
@@ -210,10 +211,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 purchase = _comprasService.ReceivePurchase(id, (int)userId, purchaseReception);
+                Log.Information($"Compra recibida: {purchase.id}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al recibir la compra {id}", id);
+                Log.Error(ex, "Error al recibir la compra {id}", id);
                 return BadRequest(new { message = ex.Message });
             }
 
@@ -231,10 +233,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 compra = _comprasService.CancelPurchase(id);
+                Log.Information($"Compra cancelada: {compra.id}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al cancelar la compra {id}", id);
+                Log.Error(ex, "Error al cancelar la compra {id}", id);
                 return BadRequest(new { message = ex.Message });
             }
 
@@ -250,10 +253,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _comprasService.DisablePurchase(id);
+                Log.Information($"Compra dada de baja: {id}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al dar de baja la compra {id}", id);
+                Log.Error(ex, "Error al dar de baja la compra {id}", id);
                 return BadRequest(new { message = ex.Message });
             }
 
@@ -269,10 +273,11 @@ namespace BoerisCreaciones.Api.Controllers
             try
             {
                 _comprasService.DeletePurchase(id);
+                Log.Information($"Compra eliminada: {id}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al eliminar la compra {id}", id);
+                Log.Error(ex, "Error al eliminar la compra {id}", id);
                 return BadRequest(new { message = ex.Message });
             }
 
@@ -299,7 +304,7 @@ namespace BoerisCreaciones.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                Log.Error(ex.Message);
                 return BadRequest(new { message = ex.Message });
             }
 
