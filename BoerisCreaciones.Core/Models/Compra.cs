@@ -119,7 +119,7 @@ namespace BoerisCreaciones.Core.Models.Compras
 
         public CompraDTO(int id, UsuarioDTO requester_partner, ProveedorDTO provider, string description, DateTime order_date, DateTime? reception_date, DateTime? canceled_date, string currency, char payment_type, char reception_mode, char status, SucursalDTO? reception_branch, float? price, string? invoice)
         {
-            this.id= id;
+            this.id = id;
             this.requester_partner = requester_partner;
             this.provider = provider;
             this.description = description;
@@ -130,7 +130,7 @@ namespace BoerisCreaciones.Core.Models.Compras
             this.payment_type = payment_type;
             this.reception_mode = reception_mode;
             this.status = status;
-
+            this.reception_branch = reception_branch;
             this.price = price;
             this.invoice = invoice;
 
