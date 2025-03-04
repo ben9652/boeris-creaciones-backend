@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Serialization;
 using System.Text;
+using Serilog;
 
 var envVariable = DotNetEnv.Env.Load();
 
@@ -20,6 +21,16 @@ if (!DotEnv.CheckEnvVars())
     Console.In.ReadLine();
     return;
 }
+
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(configuration)
+    .CreateLogger();
+
+Log.Information("Iniciando el programa");
 
 var builder = WebApplication.CreateBuilder(args);
 
