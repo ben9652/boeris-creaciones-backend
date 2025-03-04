@@ -34,6 +34,7 @@ namespace BoerisCreaciones.Api.Controllers
             if (string.IsNullOrEmpty(webRootPath))
             {
                 webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                _env.WebRootPath = webRootPath;
             }
         }
 
@@ -41,17 +42,65 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa,ss")]
 #endif
-        public IActionResult GetCompras(int userId)
+        public IActionResult GetCompras(int? userId, string? filters = null, string? searchKey = null, string? searchInput = null, string? sort = "1-0", bool ascendingSort = false)
         {
             List<CompraDTO> compras = new List<CompraDTO>();
+
+            if (userId == null)
+                return BadRequest(new { message = "El ID de usuario es requerido" });
+
+            List<char> filtros = new List<char>();
+            if (!string.IsNullOrEmpty(filters))
+            {
+                string[] keyFilters = filters.Split('-');
+                foreach (string keyFilter in keyFilters)
+                {
+                    // Si keyFilter no es 'P', 'R', o 'C', devolver un BadRequest
+                    if (keyFilter != "P" && keyFilter != "R" && keyFilter != "C")
+                        return BadRequest(new { message = "Filtro no válido" });
+                }
+            }
+
+            BusquedaCompra? busqueda = null;
+            if (!string.IsNullOrEmpty(searchKey) && !string.IsNullOrEmpty(searchInput))
+            {
+                if (
+                    searchKey != "id" &&
+                    searchKey != "description" &&
+                    searchKey != "partner" &&
+                    searchKey != "provider" &&
+                    searchKey != "date" &&
+                    searchKey != "budget" &&
+                    searchKey != "branch"
+                )
+                    return BadRequest(new { message = "Clave de búsqueda no válida" });
+
+                busqueda = new BusquedaCompra(searchKey, searchInput);
+            }
+
+            if (!string.IsNullOrEmpty(sort))
+            {
+                if (
+                    sort != "0-0" &&
+                    sort != "0-1" &&
+                    sort != "0-2" &&
+                    sort != "1-0" &&
+                    sort != "1-1" &&
+                    sort != "1-2" &&
+                    sort != "2-0" &&
+                    sort != "2-1"
+                )
+                    return BadRequest(new { message = "Clave de ordenamiento no válido" });
+            }
+
             try
             {
-                compras = _comprasService.GetPurchases(userId);
+                compras = _comprasService.GetPurchases((int)userId, filtros, busqueda, sort, ascendingSort);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener las compras");
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
             return Ok(compras);
         }
@@ -60,12 +109,15 @@ namespace BoerisCreaciones.Api.Controllers
 #if RELEASE
         [Authorize(Roles = "a,sa,ss")]
 #endif
-        public IActionResult GetCompra(int id, int userId)
+        public IActionResult GetCompra(int id, int? userId)
         {
+            if (userId == null)
+                return BadRequest(new { message = "El ID de usuario es requerido" });
+
             CompraDTO compra;
             try
             {
-                compra = _comprasService.GetPurchaseById(id, userId);
+                compra = _comprasService.GetPurchaseById(id, (int)userId);
                 if (compra == null)
                 {
                     return NotFound();
@@ -74,9 +126,23 @@ namespace BoerisCreaciones.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener la compra {id}", id);
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
             return Ok(compra);
+        }
+
+        [HttpGet("filtros")]
+        public IActionResult GetFiltros()
+        {
+            List<FiltroCompra> filtros = _comprasService.GetFilters();
+            return Ok(filtros);
+        }
+
+        [HttpGet("filtros-busqueda")]
+        public IActionResult GetSearchFilters()
+        {
+            List<BusquedaCompra> filtrosBusqueda = _comprasService.GetSearchFilters();
+            return Ok(filtrosBusqueda);
         }
 
         [HttpGet("ordenamiento")]
@@ -94,14 +160,14 @@ namespace BoerisCreaciones.Api.Controllers
         public IActionResult PostCompra(NuevaCompra compra)
         {
             if(compra.raw_materials == null || compra.raw_materials.Count == 0)
-                return BadRequest("La compra debe tener al menos una materia prima");
+                return BadRequest(new { message = "La compra debe tener al menos una materia prima" });
             UsuarioVM socio = _sociosService.GetUserById(compra.partner.id_user);
-            if (socio == null)
-                return NotFound("Socio no encontrado");
+            if (socio == null || (socio != null && socio.rol != 's'))
+                return NotFound(new { message = "El usuario que solicitó la compra no es un socio" });
 
             ProveedorDTO proveedor = _proveedoresService.GetProvider(compra.provider.id);
             if (proveedor == null)
-                return NotFound("Proveedor no encontrado");
+                return NotFound(new { message = "Proveedor no encontrado" });
 
             // Compruebo si todas las materias primas de la lista son del mismo rubro que el proveedor
             List<MateriaPrimaDTO> materiasPrimas = _materiasPrimasService.GetRawMaterialsItems();
@@ -109,10 +175,10 @@ namespace BoerisCreaciones.Api.Controllers
             {
                 MateriaPrimaDTO? materiaPrimaDTO = materiasPrimas.Find(m => m.id == materiaPrima.raw_material_id);
                 if (materiaPrimaDTO == null)
-                    return NotFound($"La materia prima {materiaPrima.raw_material_id} no existe");
+                    return NotFound(new { message = $"La materia prima {materiaPrima.raw_material_id} no existe" });
 
                 if (materiaPrimaDTO.category.id != proveedor.category.id)
-                    return BadRequest($"La materia prima {materiaPrima.raw_material_id} no pertenece al rubro del proveedor {proveedor.id}");
+                    return BadRequest(new { message = $"La materia prima {materiaPrima.raw_material_id} no pertenece al rubro del proveedor {proveedor.id}" });
             }
 
             CompraDTO compraNueva = null;
@@ -124,48 +190,55 @@ namespace BoerisCreaciones.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al agregar la compra");
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
 
             return Ok(compraNueva);
         }
 
-        [HttpPost("recibir/{id}/{userId}")]
+        [HttpPost("recibir/{id}-{userId}")]
 #if RELEASE
-        [Authorize(Roles = "a,ss")]
+        [Authorize(Roles = "a,sa,ss")]
 #endif
-        public IActionResult RecibirCompra(int id, int userId, RecepcionCompra purchaseReception)
+        public IActionResult RecibirCompra(int id, int? userId, RecepcionCompra purchaseReception)
         {
+            if (userId == null)
+                return BadRequest(new { message = "El ID de usuario es requerido" });
+
+            CompraDTO purchase = null;
+
             try
             {
-                _comprasService.ReceivePurchase(id, userId, purchaseReception);
+                purchase = _comprasService.ReceivePurchase(id, (int)userId, purchaseReception);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al recibir la compra {id}", id);
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
 
-            return NoContent();
+            return Ok(purchase);
         }
 
         [HttpPost("cancelar/{id}-{userId}")]
 #if RELEASE
-        [Authorize(Roles = "a,ss")]
+        [Authorize(Roles = "a,sa,ss")]
 #endif
         public IActionResult CancelarCompra(int id)
         {
+            CompraDTO compra = null;
+
             try
             {
-                _comprasService.CancelPurchase(id);
+                compra = _comprasService.CancelPurchase(id);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al cancelar la compra {id}", id);
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
 
-            return NoContent();
+            return Ok(compra);
         }
 
         [HttpPost("dar-de-baja/{id}")]
@@ -181,7 +254,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al dar de baja la compra {id}", id);
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
 
             return NoContent();
@@ -200,7 +273,7 @@ namespace BoerisCreaciones.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al eliminar la compra {id}", id);
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
 
             return NoContent();
@@ -219,15 +292,15 @@ namespace BoerisCreaciones.Api.Controllers
 
             try
             {
-                string fileName = await MultimediaManaging.UploadImage(files[0], _env.WebRootPath, controllerName);
+                string fileName = await MultimediaManaging.UploadFile(files[0], _env.WebRootPath, controllerName);
 
                 // Devolver la URL o la ruta del archivo guardado
-                url = $"{Request.Scheme}://{Request.Host}/{controllerName}/{fileName}";
+                url = $"https://{Request.Host}:9354/{controllerName}/{fileName}";
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest(new { ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
 
             return Ok(url);

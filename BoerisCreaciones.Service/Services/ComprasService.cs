@@ -24,9 +24,53 @@ namespace BoerisCreaciones.Service.Services
             _mapper = mapper;
         }
 
-        public List<CompraDTO> GetPurchases(int userId)
+        private string GetDatabaseAttributeName(string sortKey)
         {
-            List<CompraVM> purchases = _repositoryCompras.GetPurchases();
+            string attributeName;
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(sortKey, @"^\d+-\d+$"))
+            {
+                attributeName = sortKey switch
+                {
+                    "id" => "id_compra",
+                    "description" => "descripcion",
+                    "provider" => "proveedor",
+                    "requester_partner" => "socio",
+                    "date" => "fecha",
+                    "order_date" => "fecha_pedido",
+                    "reception_date" => "fecha_recepcion",
+                    "canceled_date" => "fecha_cancelacion",
+                    "budget" => "presupuesto",
+                    "branch" => "sucursal",
+                    _ => sortKey
+                };
+            }
+            else
+            {
+                attributeName = sortKey switch
+                {
+                    "0-0" => "proveedor",
+                    "0-1" => "socio",
+                    "0-2" => "sucursal",
+                    "1-0" => "fecha_pedido",
+                    "1-1" => "fecha_recepcion",
+                    "1-2" => "fecha_cancelacion",
+                    "2-0" => "presupuesto",
+                    "2-1" => "id_compra",
+                    _ => sortKey
+                };
+            }
+
+            return attributeName;
+        }
+
+        public List<CompraDTO> GetPurchases(int userId, List<char> filters, BusquedaCompra? search, string? sortKey, bool ascendingSort)
+        {
+            string? orderCriteria = sortKey != null ? GetDatabaseAttributeName(sortKey) : null;
+            if (search != null)
+                search.key = GetDatabaseAttributeName(search.key);
+
+            List<CompraVM> purchases = _repositoryCompras.GetPurchases(filters, search, orderCriteria, ascendingSort);
             List<CompraDTO> purchasesDTO = new List<CompraDTO>();
             foreach (CompraVM purchase in purchases)
             {
@@ -47,7 +91,7 @@ namespace BoerisCreaciones.Service.Services
                 List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
 
                 // Elimino cada compra que tiene de estado 'I' (inactivo) si el usuario es un surtidor
-                if (roles.Contains("ss"))
+                if (roles.Contains("ss") && !roles.Contains("sa"))
                     purchasesDTO.RemoveAll(p => p.state == 'I');
             }
 
@@ -64,7 +108,7 @@ namespace BoerisCreaciones.Service.Services
                 List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
 
                 // Si el usuario es un surtidor y la compra está inactiva, no la devuelvo
-                if (roles.Contains("ss") && purchase.estado == 'I')
+                if (roles.Contains("ss") && !roles.Contains("sa") && purchase.estado == 'I')
                     return null;
             }
 
@@ -103,7 +147,7 @@ namespace BoerisCreaciones.Service.Services
                 List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
 
                 // Elimino cada compra que tiene de estado 'I' (inactivo) si el usuario es un surtidor
-                if (roles.Contains("ss"))
+                if (roles.Contains("ss") && !roles.Contains("sa"))
                     purchasesDTO.RemoveAll(p => p.state == 'I');
             }
 
@@ -118,7 +162,7 @@ namespace BoerisCreaciones.Service.Services
                 List<string> roles = _rolesSociosService.GetPartnerRoles(userId);
 
                 // Si el usuario es un surtidor y la compra está inactiva, no devuelvo las materias primas
-                if (roles.Contains("ss") && _repositoryCompras.GetPurchaseById(idPurchase).estado == 'I')
+                if (roles.Contains("ss") && !roles.Contains("sa") && _repositoryCompras.GetPurchaseById(idPurchase).estado == 'I')
                     return null;
             }
 
@@ -143,6 +187,7 @@ namespace BoerisCreaciones.Service.Services
 
             alpha.children.Add(new TreeNode<string>("0-0", "Proveedores", "fas fa-user-tie", "1", "provider.name", new TreeNode<string>(alpha.key, alpha.label, alpha.icon, alpha.type, false)));
             alpha.children.Add(new TreeNode<string>("0-1", "Socios", "fas fa-user", "1", "requester_partner.firstName", new TreeNode<string>(alpha.key, alpha.label, alpha.icon, alpha.type, false)));
+            alpha.children.Add(new TreeNode<string>("0-2", "Sucursal", "fas fa-store", "1", "branch.name", new TreeNode<string>(alpha.key, alpha.label, alpha.icon, alpha.type, false)));
 
             date.children.Add(new TreeNode<string>("1-0", "Pedido", "fas fa-calendar-check", "2", "order_date", new TreeNode<string>(date.key, date.label, date.icon, date.type, false)));
             date.children.Add(new TreeNode<string>("1-1", "Recepción", "fas fa-calendar-plus", "2", "reception_date", new TreeNode<string>(date.key, date.label, date.icon, date.type, false)));
@@ -156,6 +201,29 @@ namespace BoerisCreaciones.Service.Services
             treeNodes.Add(numbers);
 
             return treeNodes;
+        }
+
+        public List<FiltroCompra> GetFilters()
+        {
+            FiltroCompra pedidas = new FiltroCompra('P', "Pedidas", "yellow");
+            FiltroCompra recibidas = new FiltroCompra('R', "Recibidas", "green");
+            FiltroCompra canceladas = new FiltroCompra('C', "Canceladas", "red");
+
+            return new List<FiltroCompra> { pedidas, recibidas, canceladas };
+        }
+
+        public List<BusquedaCompra> GetSearchFilters()
+        {
+            List<BusquedaCompra> searchFilters = new List<BusquedaCompra>();
+            searchFilters.Add(new BusquedaCompra("id", "ID"));
+            searchFilters.Add(new BusquedaCompra("description", "Descripción"));
+            searchFilters.Add(new BusquedaCompra("requester_partner", "Socio"));
+            searchFilters.Add(new BusquedaCompra("provider", "Proveedor"));
+            searchFilters.Add(new BusquedaCompra("order_date", "Fecha"));
+            searchFilters.Add(new BusquedaCompra("budget", "Presupuesto"));
+            searchFilters.Add(new BusquedaCompra("reception_branch", "Sucursal de recepción"));
+
+            return searchFilters;
         }
 
         public CompraDTO AddPurchase(NuevaCompra newPurchase)
@@ -174,7 +242,7 @@ namespace BoerisCreaciones.Service.Services
             return compraNuevaDTO;
         }
 
-        public void ReceivePurchase(int idPurchase, int userId, RecepcionCompra purchaseReception)
+        public CompraDTO ReceivePurchase(int idPurchase, int userId, RecepcionCompra purchaseReception)
         {
             char estado = _repositoryCompras.GetPurchaseById(idPurchase).estado;
             if (estado == 'C')
@@ -190,9 +258,11 @@ namespace BoerisCreaciones.Service.Services
             }
 
             _repositoryCompras.ReceivePurchase(idPurchase, userId, purchaseReception);
+
+            return GetPurchaseById(idPurchase, userId);
         }
 
-        public void CancelPurchase(int idPurchase)
+        public CompraDTO CancelPurchase(int idPurchase)
         {
             char estado = _repositoryCompras.GetPurchaseById(idPurchase).estado;
             if (estado == 'C')
@@ -208,6 +278,8 @@ namespace BoerisCreaciones.Service.Services
             }
 
             _repositoryCompras.CancelPurchase(idPurchase);
+
+            return GetPurchaseById(idPurchase, 1);
         }
 
         public void DisablePurchase(int idPurchase)

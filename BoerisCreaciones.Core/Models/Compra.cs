@@ -1,6 +1,5 @@
 ﻿using BoerisCreaciones.Core.Models.Proveedores;
 using BoerisCreaciones.Core.Models.Rubros;
-using BoerisCreaciones.Core.Models.Socio;
 using BoerisCreaciones.Core.Models.Sucursales;
 
 namespace BoerisCreaciones.Core.Models.Compras
@@ -53,7 +52,7 @@ namespace BoerisCreaciones.Core.Models.Compras
         {
         }
 
-        public NuevaCompra(List<MateriaPrimaCompraDTO> raw_materials, ProveedorDTO provider, SocioDTO partner, string currency, char payment_type, char reception_mode, string description)
+        public NuevaCompra(List<MateriaPrimaCompraDTO> raw_materials, ProveedorDTO provider, UsuarioDTO partner, string currency, char payment_type, char reception_mode, string description)
         {
             this.raw_materials = raw_materials;
             this.provider = provider;
@@ -66,7 +65,7 @@ namespace BoerisCreaciones.Core.Models.Compras
 
         public List<MateriaPrimaCompraDTO> raw_materials { get; set; }
         public ProveedorDTO provider { get; set; }
-        public SocioDTO partner { get; set; }
+        public UsuarioDTO partner { get; set; }
         public string currency { get; set; }
         public char payment_type { get; set; }
         public char reception_mode { get; set; }
@@ -88,6 +87,36 @@ namespace BoerisCreaciones.Core.Models.Compras
         public string? invoice { get; set; }
         public float additional_amount { get; set; }
         public string? additional_amount_reason { get; set; }
+    }
+
+    public class FiltroCompra
+    {
+        public FiltroCompra() { }
+
+        public FiltroCompra(char key, string name, string color)
+        {
+            this.key = key;
+            this.name = name;
+            this.color = color;
+        }
+
+        public char key { get; set; }
+        public string name { get; set; }
+        public string color { get; set; }
+    }
+
+    public class BusquedaCompra
+    {
+        public BusquedaCompra() { }
+
+        public BusquedaCompra(string key, string name)
+        {
+            this.key = key;
+            this.name = name;
+        }
+
+        public string key { get; set; }
+        public string name { get; set; }
     }
 
     public class CompraVM

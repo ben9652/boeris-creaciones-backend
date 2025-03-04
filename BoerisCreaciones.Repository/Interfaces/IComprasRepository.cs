@@ -4,7 +4,7 @@ namespace BoerisCreaciones.Repository.Interfaces
 {
     public interface IComprasRepository
     {
-        public List<CompraVM> GetPurchases();
+        public List<CompraVM> GetPurchases(List<char> filters, BusquedaCompra? search, string? orderCriteria, bool ascendingSort);
         public CompraVM GetPurchaseById(int idPurchase);
         public List<CompraVM> GetPurchasesByPartner(int idPartner);
         public List<MateriaPrimaCompraVM> GetPurchasedRawMaterials(int idPurchase);

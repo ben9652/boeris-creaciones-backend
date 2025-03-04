@@ -60,8 +60,6 @@ namespace BoerisCreaciones.Service.Helpers
             return false;
         }
 
-        // Escríbeme un método para poder subir un documento (pdf, docx, etc) o una imagen (jpg, png, etc)
-        // a un servidor y que devuelva la ruta donde se guardó el archivo
         public static async Task<string> UploadFile(IFormFile file, string rootPath, string controllerName)
         {
             string contentType = file.ContentType;

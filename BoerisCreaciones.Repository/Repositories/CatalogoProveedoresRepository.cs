@@ -17,7 +17,7 @@ namespace BoerisCreaciones.Repository.Repositories
             _ctx = ctx;
         }
 
-        public List<ProveedorVM> GetProviders()
+        public List<ProveedorVM> GetProviders(List<int>? categories = null)
         {
             List<ProveedorVM> proveedores = new List<ProveedorVM>();
 
@@ -26,6 +26,18 @@ namespace BoerisCreaciones.Repository.Repositories
                 conn.Open();
 
                 string queryString = "SELECT * FROM V_ListarCatalogoProveedores";
+
+                if (categories != null)
+                {
+                    queryString += " WHERE id_rubro IN (";
+                    for (int i = 0; i < categories.Count; i++)
+                    {
+                        queryString += categories[i];
+                        if (i < categories.Count - 1)
+                            queryString += ", ";
+                    }
+                    queryString += ")";
+                }
 
                 MySqlCommand cmd = new MySqlCommand(queryString, conn);
 

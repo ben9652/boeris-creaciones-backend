@@ -7,6 +7,7 @@ using BoerisCreaciones.Service.Helpers;
 using BoerisCreaciones.Core.Models.PrimeNG.Dropdown;
 using BoerisCreaciones.Core.Models.Rubros;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.RegularExpressions;
 using Serilog;
 
 namespace BoerisCreaciones.Api.Controllers
@@ -29,6 +30,7 @@ namespace BoerisCreaciones.Api.Controllers
             if (string.IsNullOrEmpty(webRootPath))
             {
                 webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                _env.WebRootPath = webRootPath;
             }
         }
 
@@ -59,11 +61,44 @@ namespace BoerisCreaciones.Api.Controllers
 #endif
         public ActionResult GetGroupedDropdown()
         {
-            List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTOBase>> dropdownAgrupado = new();
+            List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTO>> dropdownAgrupado = new();
 
             try
             {
                 dropdownAgrupado = _service.GetGroupedDropdown();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(new { ex.Message });
+            }
+
+            return Ok(dropdownAgrupado);
+        }
+
+        [HttpGet("Dropdown/{categories}")]
+#if RELEASE
+        [Authorize]
+#endif
+        public ActionResult GetGroupedDropdownWithFilters(string categories)
+        {
+            // Si `categories` no es una serie de números enteros separados por guiones, devolver un BadRequest
+            if (!Regex.IsMatch(categories, @"^(\d+-)*\d+$"))
+                return BadRequest(new { Message = "El formato de las categorías es inválido" });
+
+            List<int> categoriesList = new();
+            if (!string.IsNullOrEmpty(categories))
+            {
+                string[] categoriesArray = categories.Split('-');
+                foreach (string category in categoriesArray)
+                    categoriesList.Add(int.Parse(category));
+            }
+
+            List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTO>> dropdownAgrupado = new();
+
+            try
+            {
+                dropdownAgrupado = _service.GetGroupedDropdown(categoriesList);
             }
             catch (Exception ex)
             {

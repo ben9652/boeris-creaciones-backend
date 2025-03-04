@@ -26,7 +26,7 @@ namespace BoerisCreaciones.Repository.Repositories
             _repositorySucursales = repositorySucursales;
         }
 
-        public List<CompraVM> GetPurchases()
+        public List<CompraVM> GetPurchases(List<char> filters, BusquedaCompra? search, string? orderCriteria, bool ascendingSort)
         {
             List<CompraVM> comprasVM = new List<CompraVM>();
 
@@ -34,7 +34,105 @@ namespace BoerisCreaciones.Repository.Repositories
             {
                 connection.Open();
                 string query = "SELECT * FROM V_ListarCompras";
+                List<MySqlParameter> parameters = new List<MySqlParameter>();
+
+                if (
+                    search != null
+                )
+                {
+                    if (
+                        search.key.CompareTo("proveedor") != 0 &&
+                        search.key.CompareTo("socio") != 0 &&
+                        search.key.CompareTo("sucursal") != 0
+                    )
+                    {
+                        if (search.key.CompareTo("fecha") == 0)
+                        {
+                            DateTime endDate;
+                            if (DateTime.TryParseExact(search.name, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out endDate))
+                            {
+                                query += " WHERE (fecha_pedido <= @endDate OR fecha_recepcion <= @endDate OR fecha_cancelado <= @endDate)";
+                                parameters.Add(new MySqlParameter("@endDate", endDate));
+                            }
+                            else
+                            {
+                                throw new ArgumentException("Formato de fecha inválido. Por favor, usar dd/MM/yyyy.");
+                            }
+                        }
+                        else if (search.key.CompareTo("presupuesto") == 0)
+                        {
+                            query += " WHERE presupuesto <= @presupuesto";
+                            parameters.Add(new MySqlParameter("@presupuesto", float.Parse(search.name)));
+                        }
+                        else
+                        {
+                            query += " WHERE " + search.key + " LIKE @searchName";
+                            parameters.Add(new MySqlParameter("@searchName", "%" + search.name + "%"));
+                        }
+                    }
+                    else
+                    {
+                        if (search.key.CompareTo("proveedor") == 0)
+                        {
+                            query += " WHERE id_proveedor IN (SELECT id_proveedor FROM Proveedores WHERE nombre LIKE @searchName)";
+                            parameters.Add(new MySqlParameter("@searchName", "%" + search.name + "%"));
+                        }
+                        if (search.key.CompareTo("socio") == 0)
+                        {
+                            query += " WHERE id_socio IN (SELECT id_usuario FROM Usuarios WHERE nombre LIKE @searchName)";
+                            parameters.Add(new MySqlParameter("@searchName", "%" + search.name + "%"));
+                        }
+                        if (search.key.CompareTo("sucursal") == 0)
+                        {
+                            query += " WHERE id_sucursal IN (SELECT id_sucursal FROM Sucursales WHERE nombre LIKE @searchName)";
+                            parameters.Add(new MySqlParameter("@searchName", "%" + search.name + "%"));
+                        }
+                    }
+                }
+
+                if (filters.Count > 0)
+                {
+                    if (search != null)
+                        query += " AND ";
+                    else
+                        query += " WHERE ";
+                    query += "estado IN (";
+                    for (int i = 0; i < filters.Count; i++)
+                    {
+                        string paramName = "@filter" + i;
+                        query += paramName;
+                        if (i < filters.Count - 1)
+                            query += ", ";
+                        parameters.Add(new MySqlParameter(paramName, filters[i]));
+                    }
+                    query += ")";
+                }
+
+                if (
+                    orderCriteria != null &&
+                    orderCriteria.CompareTo("proveedor") != 0 &&
+                    orderCriteria.CompareTo("socio") != 0 &&
+                    orderCriteria.CompareTo("sucursal") != 0
+                )
+                {
+                    if (orderCriteria.Contains("fecha"))
+                    {
+                        if (orderCriteria.Contains("pedido"))
+                            query += " ORDER BY CASE estado WHEN 'P' THEN 1 WHEN 'R' THEN 2 WHEN 'C' THEN 3 END, fecha_pedido";
+                        else if (orderCriteria.Contains("recepcion"))
+                            query += " ORDER BY CASE estado WHEN 'R' THEN 1 WHEN 'P' THEN 2 WHEN 'C' THEN 3 END, fecha_recepcion";
+                        else if (orderCriteria.Contains("cancelado"))
+                            query += " ORDER BY CASE estado WHEN 'C' THEN 1 WHEN 'R' THEN 2 WHEN 'P' THEN 3 END, fecha_cancelado";
+                    }
+                    else
+                        query += " ORDER BY " + orderCriteria;
+
+                    if (!ascendingSort)
+                        query += " DESC";
+                }
+
                 MySqlCommand command = new MySqlCommand(query, connection);
+                command.Parameters.AddRange(parameters.ToArray());
                 MySqlDataReader reader = command.ExecuteReader();
 
                 while (reader.Read())
@@ -84,6 +182,33 @@ namespace BoerisCreaciones.Repository.Repositories
                     );
 
                     comprasVM.Add(compra);
+                }
+            }
+
+            if (orderCriteria != null)
+            {
+                if (orderCriteria.CompareTo("proveedor") == 0)
+                {
+                    if (ascendingSort)
+                        comprasVM.Sort((c1, c2) => c1.proveedor.nombre.CompareTo(c2.proveedor.nombre));
+                    else
+                        comprasVM.Sort((c1, c2) => c2.proveedor.nombre.CompareTo(c1.proveedor.nombre));
+                }
+
+                if (orderCriteria.CompareTo("socio") == 0)
+                {
+                    if (ascendingSort)
+                        comprasVM.Sort((c1, c2) => c1.socio_que_hizo_pedido.nombre.CompareTo(c2.socio_que_hizo_pedido.nombre));
+                    else
+                        comprasVM.Sort((c1, c2) => c2.socio_que_hizo_pedido.nombre.CompareTo(c1.socio_que_hizo_pedido.nombre));
+                }
+
+                if (orderCriteria.CompareTo("sucursal") == 0)
+                {
+                    if (ascendingSort)
+                        comprasVM.Sort((c1, c2) => c1.sucursal?.nombre.CompareTo(c2.sucursal?.nombre) ?? 1);
+                    else
+                        comprasVM.Sort((c1, c2) => c2.sucursal?.nombre.CompareTo(c1.sucursal?.nombre) ?? 1);
                 }
             }
 
@@ -312,34 +437,46 @@ namespace BoerisCreaciones.Repository.Repositories
             using (MySqlConnection connection = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 connection.Open();
-                MySqlCommand command = new MySqlCommand($"SELECT presupuesto FROM ComprasMateriasPrimas WHERE id_compra = {idPurchase}", connection);
-                MySqlDataReader reader = command.ExecuteReader();
+
+                using (MySqlCommand command = new MySqlCommand($"SELECT * FROM Socios WHERE id_usuario = {idUser}", connection))
+                {
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                            throw new Exception("El usuario que quiere recibir la compra no es ni un socio");
+                    }
+                }
 
                 float presupuesto = 0;
-                if(reader.Read())
-                    presupuesto = reader.GetFloat(0);
+                using (MySqlCommand selectCommand = new MySqlCommand($"SELECT presupuesto FROM ComprasMateriasPrimas WHERE id_compra = {idPurchase}", connection))
+                {
+                    using(MySqlDataReader reader = selectCommand.ExecuteReader())
+                    {
+                        if (reader.Read())
+                            presupuesto = reader.GetFloat(0);
+                    }
+                }
 
-                string query = "UPDATE ComprasMateriasPrimas SET estado = 'R', fecha_recepcion = @fecha, precio_final = @precio, razon_monto_adicional = @razon, factura = @factura WHERE id_compra = @id";
-                command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@fecha", DateTime.Now);
-                command.Parameters.AddWithValue("@precio", presupuesto + purchaseReception.additional_amount);
-                command.Parameters.AddWithValue("@razon", purchaseReception.additional_amount_reason != null ? purchaseReception.additional_amount_reason : DBNull.Value);
-                command.Parameters.AddWithValue("@factura", purchaseReception.invoice != null ? purchaseReception.invoice : DBNull.Value);
-                command.Parameters.AddWithValue("@id", idPurchase);
-                command.Prepare();
-                command.ExecuteNonQuery();
+                string query = "UPDATE ComprasMateriasPrimas SET estado = 'R', fecha_recepcion = @fecha, precio_final = @precio, razon_monto_adicional = @razon, factura = @factura, id_sucursal = @id_sucursal WHERE id_compra = @id";
+                using (MySqlCommand updateCommand = new MySqlCommand(query, connection))
+                {
+                    updateCommand.Parameters.AddWithValue("@fecha", DateTime.Now);
+                    updateCommand.Parameters.AddWithValue("@precio", presupuesto + purchaseReception.additional_amount);
+                    updateCommand.Parameters.AddWithValue("@razon", purchaseReception.additional_amount_reason);
+                    updateCommand.Parameters.AddWithValue("@factura", purchaseReception.invoice);
+                    updateCommand.Parameters.AddWithValue("@id_sucursal", purchaseReception.id_branch_reception);
+                    updateCommand.Parameters.AddWithValue("@id", idPurchase);
+                    updateCommand.Prepare();
+                    updateCommand.ExecuteNonQuery();
+                }
             }
             
-            CompraVM compra = GetPurchaseById(idPurchase);
-
             using (MySqlConnection connection = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO EntradasMP (id_usuario, razon, fecha) VALUES (@id_usuario, 'Compra @id_compra: @descripcion', @fecha)";
+                string query = $"INSERT INTO EntradasMP (id_usuario, razon, fecha) VALUES (@id_usuario, 'c({idPurchase})', @fecha)";
                 MySqlCommand command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@id_usuario", idUser);
-                command.Parameters.AddWithValue("@id_compra", idPurchase);
-                command.Parameters.AddWithValue("@descripcion", compra.descripcion);
                 command.Parameters.AddWithValue("@fecha", DateTime.Now);
                 command.Prepare();
                 command.ExecuteNonQuery();
@@ -362,13 +499,14 @@ namespace BoerisCreaciones.Repository.Repositories
 
             List<MateriaPrimaCompraVM> materiasPrimasCompradas = GetPurchasedRawMaterials(idPurchase);
 
-            foreach (MateriaPrimaCompraVM materiaPrima in materiasPrimasCompradas)
+            using (MySqlConnection connection = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
-                using (MySqlConnection connection = new MySqlConnection(_connectionStringProvider.ConnectionString))
+                connection.Open();
+                string query = "INSERT INTO LineasEntradasMP (id_entradaMP, id_matP, cantidad) VALUES (@id, @id_matP, @cantidad)";
+                MySqlCommand command = new MySqlCommand(query, connection);
+                foreach (MateriaPrimaCompraVM materiaPrima in materiasPrimasCompradas)
                 {
-                    connection.Open();
-                    string query = "INSERT INTO LineasEntradasMP (id_entradaMP, id_matP, cantidad) VALUES (@id, @id_matP, @cantidad)";
-                    MySqlCommand command = new MySqlCommand(query, connection);
+                    command.Parameters.Clear();
                     command.Parameters.AddWithValue("@id", idEntrada);
                     command.Parameters.AddWithValue("@id_matP", materiaPrima.id_matP);
                     command.Parameters.AddWithValue("@cantidad", materiaPrima.cantidad);
@@ -377,18 +515,84 @@ namespace BoerisCreaciones.Repository.Repositories
                 }
             }
 
+            List<MateriaPrimaCompraVM> materiasPrimasCompradasNoContables = materiasPrimasCompradas.FindAll(m => m.cantidad == 0);
+            List<MateriaPrimaCompraVM> materiasPrimasCompradasContables = materiasPrimasCompradas.FindAll(m => m.cantidad != 0);
+
             using (MySqlConnection connection = new MySqlConnection(_connectionStringProvider.ConnectionString))
             {
                 connection.Open();
                 string query = "UPDATE MateriasPrimas SET cantidad_restante = cantidad_restante + @cantidad WHERE id_matP = @id";
                 MySqlCommand command = new MySqlCommand(query, connection);
-                foreach (MateriaPrimaCompraVM materiaPrima in materiasPrimasCompradas)
+                foreach (MateriaPrimaCompraVM materiaPrima in materiasPrimasCompradasContables)
                 {
                     command.Parameters.Clear();
                     command.Parameters.AddWithValue("@id", materiaPrima.id_matP);
                     command.Parameters.AddWithValue("@cantidad", materiaPrima.cantidad);
                     command.Prepare();
                     command.ExecuteNonQuery();
+                }
+
+                query = "UPDATE MateriasPrimas SET cantidad_restante = 1 WHERE id_matP = @id";
+                command = new MySqlCommand(query, connection);
+                foreach (MateriaPrimaCompraVM materiaPrima in materiasPrimasCompradasNoContables)
+                {
+                    command.Parameters.Clear();
+                    command.Parameters.AddWithValue("@id", materiaPrima.id_matP);
+                    command.Prepare();
+                    command.ExecuteNonQuery();
+                }
+
+                connection.Close();
+            }
+
+            using (MySqlConnection connection = new MySqlConnection(_connectionStringProvider.ConnectionString))
+            {
+                connection.Open();
+                foreach (MateriaPrimaCompraVM materiaPrima in materiasPrimasCompradas)
+                {
+                    string query = "SELECT * FROM AlojamientosMP WHERE id_sucursal = @id_sucursal AND id_matP = @id_matP";
+                    MySqlCommand command = new MySqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@id_sucursal", purchaseReception.id_branch_reception);
+                    command.Parameters.AddWithValue("@id_matP", materiaPrima.id_matP);
+                    command.Prepare();
+                    MySqlDataReader reader = command.ExecuteReader();
+
+                    bool hayAlojamientosHechosParaEstaMateriaPrima = reader.Read();
+
+                    reader.Close();
+
+                    if (materiaPrima.cantidad != 0)
+                    {
+                        if (hayAlojamientosHechosParaEstaMateriaPrima)
+                        {
+                            query = "UPDATE AlojamientosMP SET cantidad = cantidad + @cantidad WHERE id_sucursal = @id_sucursal AND id_matP = @id_matP";
+                            command = new MySqlCommand(query, connection);
+                            command.Parameters.AddWithValue("@id_sucursal", purchaseReception.id_branch_reception);
+                            command.Parameters.AddWithValue("@id_matP", materiaPrima.id_matP);
+                            command.Parameters.AddWithValue("@cantidad", materiaPrima.cantidad);
+                            command.Prepare();
+                            command.ExecuteNonQuery();
+                        }
+                        else
+                        {
+                            query = "INSERT INTO AlojamientosMP (id_sucursal, id_matP, cantidad) VALUES (@id_sucursal, @id_matP, @cantidad)";
+                            command = new MySqlCommand(query, connection);
+                            command.Parameters.AddWithValue("@id_sucursal", purchaseReception.id_branch_reception);
+                            command.Parameters.AddWithValue("@id_matP", materiaPrima.id_matP);
+                            command.Parameters.AddWithValue("@cantidad", materiaPrima.cantidad);
+                            command.Prepare();
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        query = "UPDATE AlojamientosMP SET cantidad = 1 WHERE id_sucursal = @id_sucursal AND id_matP = @id_matP";
+                        command = new MySqlCommand(query, connection);
+                        command.Parameters.AddWithValue("@id_sucursal", purchaseReception.id_branch_reception);
+                        command.Parameters.AddWithValue("@id_matP", materiaPrima.id_matP);
+                        command.Prepare();
+                        command.ExecuteNonQuery();
+                    }
                 }
             }
         }

@@ -12,6 +12,7 @@ namespace BoerisCreaciones.Service.Interfaces
     public interface ISociosService
     {
         public List<SocioDTO> GetPartners();
+        public SocioDTO GetPartner(int id);
         public SocioDTO RegisterPartner(SocioRegistro user);
         public void DeletePartner(int id);
     }

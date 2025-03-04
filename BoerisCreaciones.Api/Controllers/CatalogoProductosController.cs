@@ -21,6 +21,13 @@ namespace BoerisCreaciones.Api.Controllers
             _logger = logger;
             _service = service;
             _env = env;
+
+            var webRootPath = _env.WebRootPath;
+            if (string.IsNullOrEmpty(webRootPath))
+            {
+                webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                _env.WebRootPath = webRootPath;
+            }
         }
 
         [HttpGet]

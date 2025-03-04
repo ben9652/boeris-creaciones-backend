@@ -34,34 +34,37 @@ namespace BoerisCreaciones.Service.Services
             return _mapper.Map<MateriaPrimaDTO>(materiaPrima);
         }
 
-        public List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTOBase>> GetGroupedDropdown()
+        public List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTO>> GetGroupedDropdown(List<int>? categories = null)
         {
-            List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTOBase>> groupedDropdown = new();
+            List<SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTO>> groupedDropdown = new();
 
-            List<MateriaPrimaVM> materiasPrimasBD = _repository.GetRawMaterialsItems();
+            List<MateriaPrimaVM> materiasPrimasBD = _repository.GetRawMaterialsItems(categories);
 
             if (materiasPrimasBD.Count == 0)
                 return groupedDropdown;
 
             materiasPrimasBD = materiasPrimasBD.OrderBy(materiaPrima => materiaPrima.id_rubroMP).ToList();
 
+            if(materiasPrimasBD.Count == 0)
+                return groupedDropdown;
+
             RubroMateriaPrimaDTO rubro = new RubroMateriaPrimaDTO(materiasPrimasBD[0].id_rubroMP, materiasPrimasBD[0].rubro);
-            List<SelectItem<MateriaPrimaDTOBase>> group = new();
+            List<SelectItem<MateriaPrimaDTO>> group = new();
             foreach(MateriaPrimaVM matP in materiasPrimasBD)
             {
                 if(matP.id_rubroMP != rubro.id)
                 {
-                    List<SelectItem<MateriaPrimaDTOBase>> newGroup = new(group);
-                    groupedDropdown.Add(new SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTOBase>(rubro.name, rubro, newGroup));
+                    List<SelectItem<MateriaPrimaDTO>> newGroup = new(group);
+                    groupedDropdown.Add(new SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTO>(rubro.name, rubro, newGroup));
                     rubro = new RubroMateriaPrimaDTO(matP.id_rubroMP, matP.rubro);
                     group.Clear();
                 }
 
-                MateriaPrimaDTOBase materiaPrimaDTO = _mapper.Map<MateriaPrimaDTOBase>(matP);
-                group.Add(new SelectItem<MateriaPrimaDTOBase>(materiaPrimaDTO.name, materiaPrimaDTO));
+                MateriaPrimaDTO materiaPrimaDTO = _mapper.Map<MateriaPrimaDTO>(matP);
+                group.Add(new SelectItem<MateriaPrimaDTO>(materiaPrimaDTO.name, materiaPrimaDTO));
             }
 
-            groupedDropdown.Add(new SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTOBase>(rubro.name, rubro, group));
+            groupedDropdown.Add(new SelectItemGroup<RubroMateriaPrimaDTO, MateriaPrimaDTO>(rubro.name, rubro, group));
 
             return groupedDropdown;
         }

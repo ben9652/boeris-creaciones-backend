@@ -42,6 +42,25 @@ namespace BoerisCreaciones.Api.Controllers
             return Ok(partners);
         }
 
+        [HttpGet("{id}")]
+#if RELEASE
+        [Authorize]
+#endif
+        public ActionResult<SocioDTO> GetPartner(int id)
+        {
+            SocioDTO partner = null;
+            try
+            {
+                partner = _service.GetPartner(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return NotFound(new { ex.Message });
+            }
+            return Ok(partner);
+        }
+
         [HttpPost]
 #if RELEASE
         [Authorize(Roles = "a,sa")]

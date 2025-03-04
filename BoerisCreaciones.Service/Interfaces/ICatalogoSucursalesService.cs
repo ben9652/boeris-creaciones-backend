@@ -8,7 +8,7 @@ namespace BoerisCreaciones.Service.Interfaces
     {
         public List<SucursalDTO> GetAll();
         public SucursalDTO GetById(int id);
-        public List<SelectItemGroup<LocalidadDTOBase, SucursalDTOBase>> GetGroupedDropdown();
+        public List<SelectItemGroup<LocalidadDTOBase, SucursalDTO>> GetGroupedDropdown();
         public SucursalDTO Create(SucursalDTO sucursal);
         public SucursalDTO Update(SucursalDTO sucursal, List<string> attributes);
         public void Delete(int id);

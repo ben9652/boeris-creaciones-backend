@@ -71,6 +71,61 @@ namespace BoerisCreaciones.Repository.Repositories
             return partnersList;
         }
 
+        public UsuarioVM GetPartner(int id)
+        {
+            UsuarioVM partner = null;
+
+            using (MySqlConnection conn = new MySqlConnection(_connectionStringProvider.ConnectionString))
+            {
+                conn.Open();
+
+                string queryString = "SELECT * FROM V_MostrarSocios WHERE id_usuario = @id_usuario";
+
+                MySqlCommand cmd = new MySqlCommand(queryString, conn);
+
+                cmd.Parameters.AddWithValue("@id_usuario", id);
+
+                DbDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    object domicilioDB = reader["domicilio"];
+                    object telefonoDB = reader["telefono"];
+                    object observacionesDB = reader["observaciones"];
+
+                    int id_usuario = Convert.ToInt32(reader["id_usuario"]);
+                    string? nombre = reader["nombre"].ToString();
+                    string? email = reader["email"].ToString();
+                    string? username = reader["username"].ToString();
+                    string? password = reader["password"].ToString();
+                    DateTime fecha_alta = Convert.ToDateTime(reader["fecha_alta"]);
+                    char rol = Convert.ToChar(reader["rol"]);
+                    char estado = Convert.ToChar(reader["estado"]);
+                    string? domicilio = domicilioDB == DBNull.Value ? null : domicilioDB.ToString();
+                    UInt64? telefono = telefonoDB == DBNull.Value ? null : Convert.ToUInt64(telefonoDB);
+                    string? observaciones = observacionesDB == DBNull.Value ? null : observacionesDB.ToString();
+
+                    partner = new UsuarioVM(
+                        id_usuario,
+                        nombre,
+                        email,
+                        username,
+                        password,
+                        fecha_alta,
+                        rol,
+                        estado,
+                        domicilio,
+                        telefono,
+                        observaciones
+                    );
+                }
+
+                conn.Close();
+            }
+
+            return partner;
+        }
+
         public UsuarioVM RegisterPartner(UsuarioVM userObj)
         {
             return ctx.LoadStoredProcedure("CrearSocio", _connectionStringProvider)
